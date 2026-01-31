@@ -1,6 +1,7 @@
 """
 Core configuration settings for the AutoDev Agent backend.
 """
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -36,6 +37,16 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list = ["*"]
     
+    @model_validator(mode='after')
+    def sync_redis_urls(self) -> 'Settings':
+        """Sync Celery URLs with REDIS_URL if not explicitly set."""
+        if self.REDIS_URL != "redis://redis:6379/0":
+            if self.CELERY_BROKER_URL == "redis://redis:6379/0":
+                self.CELERY_BROKER_URL = self.REDIS_URL
+            if self.CELERY_RESULT_BACKEND == "redis://redis:6379/0":
+                self.CELERY_RESULT_BACKEND = self.REDIS_URL
+        return self
+
     class Config:
         env_file = ".env"
         case_sensitive = True
