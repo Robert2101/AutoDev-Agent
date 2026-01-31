@@ -34,10 +34,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     
     # CORS
-    CORS_ORIGINS: list = [
-        "http://localhost:3000",
-        "http://frontend:3000",
-    ]
+    # CORS
+    CORS_ORIGINS: list = ["*"]
     
     class Config:
         env_file = ".env"
