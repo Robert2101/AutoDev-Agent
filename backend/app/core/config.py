@@ -52,15 +52,19 @@ class Settings(BaseSettings):
 
         if is_redis_missing:
             # Use Database for tasks
+            # This is the most stable way to run on Render Free Tier!
             self.CELERY_BROKER_URL = db_url.replace("postgresql://", "sqla+postgresql://", 1)
             self.CELERY_RESULT_BACKEND = "db+" + db_url
         else:
-            # Redis is explicitly set. If it's Upstash, ensure we use SSL (rediss://)
-            if "upstash.io" in self.REDIS_URL.lower() and self.REDIS_URL.startswith("redis://"):
-                self.REDIS_URL = self.REDIS_URL.replace("redis://", "rediss://", 1)
+            # Redis is explicitly set.
+            # Upstash FIX: Upstash REQUIRES rediss:// (SSL) - we force it here.
+            redis_url = self.REDIS_URL.strip()
+            if "upstash.io" in redis_url.lower() and redis_url.startswith("redis://"):
+                redis_url = redis_url.replace("redis://", "rediss://", 1)
             
-            self.CELERY_BROKER_URL = self.REDIS_URL
-            self.CELERY_RESULT_BACKEND = self.REDIS_URL
+            self.REDIS_URL = redis_url
+            self.CELERY_BROKER_URL = redis_url
+            self.CELERY_RESULT_BACKEND = redis_url
             
         return self
 
