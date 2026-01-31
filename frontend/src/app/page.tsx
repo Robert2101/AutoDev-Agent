@@ -87,7 +87,7 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto text-center">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full mb-6">
                         <Sparkles className="w-4 h-4 text-primary-400" />
-                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 1.5 Pro</span>
+                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 2.5 Flash</span>
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-bold text-dark-50 mb-4 text-shadow">
@@ -134,7 +134,7 @@ export default function HomePage() {
                                             </li>
                                             <li className="flex gap-2">
                                                 <span className="text-primary-400 font-bold">2.</span>
-                                                <span><strong className="text-white">AI Analysis</strong>: Gemini 1.5 Pro scans for bugs & security issues.</span>
+                                                <span><strong className="text-white">AI Analysis</strong>: Gemini 2.5 Flash scans for bugs & security issues.</span>
                                             </li>
                                             <li className="flex gap-2">
                                                 <span className="text-primary-400 font-bold">3.</span>

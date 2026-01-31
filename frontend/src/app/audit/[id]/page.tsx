@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, GitBranch, FileCode, AlertTriangle, CheckCircle, Code2, ExternalLink } from 'lucide-react';
+import { ArrowLeft, GitBranch, FileCode, AlertTriangle, CheckCircle, Code2, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { auditAPI, AuditDetail } from '@/lib/api';
 import { formatRelativeTime, getStatusColor, formatStatus, getSeverityColor } from '@/lib/utils';
@@ -131,6 +131,53 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
                         </div>
                     </div>
                 </div>
+
+                {/* Troubleshooting Card for Auth Errors */}
+                {audit.logs && audit.logs.some(l => l.message && (l.message.includes('403 Forbidden') || l.message.includes('repo scope'))) && (
+                    <div className="mb-8 p-6 bg-red-500/10 border border-red-500/50 rounded-2xl">
+                        <div className="flex items-start gap-4">
+                            <AlertTriangle className="w-8 h-8 text-red-500 flex-shrink-0" />
+                            <div>
+                                <h3 className="text-xl font-bold text-red-400 mb-2">Authentication Failed!</h3>
+                                <p className="text-dark-300 mb-4">
+                                    The agent cannot push to your repository because your <strong>GitHub Token</strong> is missing permissions.
+                                </p>
+                                <div className="bg-dark-900/80 p-4 rounded-lg text-sm text-red-300 font-mono mb-4 border border-red-500/20">
+                                    Error: 403 Forbidden - Missing &apos;repo&apos; scope in GitHub Token
+                                </div>
+                                <h4 className="font-bold text-dark-200 mb-2">How to Fix It:</h4>
+                                <ol className="list-decimal list-inside space-y-2 text-dark-300 mb-4 text-sm">
+                                    <li>Go to <a href="https://github.com/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300 underline font-medium">GitHub Developer Settings</a></li>
+                                    <li>Edit your token (or create a new one)</li>
+                                    <li><strong>CHECK THE &apos;repo&apos; BOX</strong> ✅ (Full control of private repositories)</li>
+                                    <li>Update your <code>.env</code> file with the new token</li>
+                                    <li>Restart the agent: <code>docker-compose restart</code></li>
+                                </ol>
+                                <p className="text-sm text-dark-400">
+                                    After fixing, please delete this audit and try again.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Rate Limit Warning */}
+                {audit.logs && audit.logs.some(l => l.message && l.message.includes('429')) && (
+                    <div className="mb-8 p-6 bg-yellow-500/10 border border-yellow-500/50 rounded-2xl">
+                        <div className="flex items-start gap-4">
+                            <Clock className="w-8 h-8 text-yellow-500 flex-shrink-0" />
+                            <div>
+                                <h3 className="text-xl font-bold text-yellow-400 mb-2">AI Agent is Busy (Rate Limit)</h3>
+                                <p className="text-dark-300 mb-2">
+                                    The AI model usage limit has been exceeded. The agent is waiting for 60 seconds before retrying.
+                                </p>
+                                <p className="text-sm text-dark-400">
+                                    Please be patient. The audit will continue automatically.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Live Logs */}
                 <div className="mb-8">

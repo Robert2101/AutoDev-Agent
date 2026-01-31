@@ -4,6 +4,7 @@ Gemini AI Agent - The brain of the AutoDev Agent.
 This module uses Google's Gemini 1.5 Pro API to analyze code and generate fixes.
 """
 import google.generativeai as genai
+import time
 from typing import List, Dict, Optional
 from app.core.config import settings
 from app.models import IssueType, IssueSeverity
@@ -29,7 +30,7 @@ class GeminiAgent:
     
     def __init__(self):
         """Initialize the Gemini AI model."""
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
         
         # System prompt with Chain of Thought structure
         self.system_prompt = """You are a Senior Software Engineer with expertise in:
@@ -97,8 +98,11 @@ Severity levels: low, medium, high, critical
         Returns:
             List of detected issues
         """
-        try:
-            prompt = f"""{self.system_prompt}
+        max_retries = 3
+        
+        for attempt in range(max_retries):
+            try:
+                prompt = f"""{self.system_prompt}
 
 **File to Analyze**: {file_path}
 **Language**: {language}
@@ -110,36 +114,45 @@ Severity levels: low, medium, high, critical
 Analyze this file and return ONLY a valid JSON object with detected issues.
 If no issues are found, return: {{"issues": []}}
 """
-            
-            response = self.model.generate_content(prompt)
-            result_text = response.text.strip()
-            
-            # Extract JSON from markdown code blocks if present
-            if "```json" in result_text:
-                result_text = result_text.split("```json")[1].split("```")[0].strip()
-            elif "```" in result_text:
-                result_text = result_text.split("```")[1].split("```")[0].strip()
-            
-            # Parse JSON response
-            result = json.loads(result_text)
-            
-            issues = result.get("issues", [])
-            
-            # Add file_path to each issue if not present
-            for issue in issues:
-                if "file_path" not in issue:
-                    issue["file_path"] = file_path
-            
-            logger.info(f"Analyzed {file_path}: Found {len(issues)} issues")
-            return issues
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse Gemini response for {file_path}: {e}")
-            logger.error(f"Response text: {result_text[:500]}")
-            return []
-        except Exception as e:
-            logger.error(f"Error analyzing {file_path}: {e}")
-            return []
+                
+                response = self.model.generate_content(prompt)
+                result_text = response.text.strip()
+                
+                # Extract JSON from markdown code blocks if present
+                if "```json" in result_text:
+                    result_text = result_text.split("```json")[1].split("```")[0].strip()
+                elif "```" in result_text:
+                    result_text = result_text.split("```")[1].split("```")[0].strip()
+                
+                # Parse JSON response
+                result = json.loads(result_text)
+                
+                issues = result.get("issues", [])
+                
+                # Add file_path to each issue if not present
+                for issue in issues:
+                    if "file_path" not in issue:
+                        issue["file_path"] = file_path
+                
+                logger.info(f"Analyzed {file_path}: Found {len(issues)} issues")
+                return issues
+                
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse Gemini response for {file_path}: {e}")
+                logger.error(f"Response text: {result_text[:500]}")
+                return []
+            except Exception as e:
+                if "429" in str(e):
+                    if attempt < max_retries - 1:
+                        wait_time = 60  # Wait 1 minute for safe quota reset
+                        logger.warning(f"Rate limited (429). Retrying in {wait_time}s...")
+                        time.sleep(wait_time)
+                        continue
+                
+                logger.error(f"Error analyzing {file_path}: {e}")
+                if attempt == max_retries - 1:
+                    raise e
+        return []
     
     def scan_for_secrets(self, file_content: str) -> List[Dict]:
         """

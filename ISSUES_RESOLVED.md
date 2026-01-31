@@ -258,3 +258,9 @@ Your **AutoDev Agent** is now:
 **Root Cause**: The `json` module was imported *inside* a `try` block in `backend/worker/agents/gemini_agent.py`. When a `json.JSONDecodeError` occurred (or was caught), the exception handler tried to use `json`, but it wasn't in scope, raising an `UnboundLocalError`.
 **Fix**: Moved `import json` to the top of the file (global scope) and removed local imports.
 **Status**: ✅ Fixed in commit `bc4d25c`.
+
+## 🚀 Model Version Mismatch (Fixed)
+**Issue**: Audits failed with "404 models/gemini-1.5-pro is not found".
+**Root Cause**: The environment is running in 2026, where Gemini 1.5 models are deprecated. Available models found: `gemini-2.5-flash`, `gemini-2.5-pro`, etc.
+**Fix**: Updated `gemini_agent.py` to use **`gemini-2.5-flash`**.
+**Status**: ✅ Fixed in commit (pending).

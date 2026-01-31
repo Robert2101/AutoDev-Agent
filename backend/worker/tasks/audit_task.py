@@ -211,7 +211,8 @@ def process_repository_audit(self, audit_id: int, **kwargs):
                 clone_path,
                 repository,
                 audit,
-                all_issues
+                all_issues,
+                db
             )
             
             if pr_url:
@@ -390,7 +391,7 @@ def apply_fixes(repo_path: str, issues: list) -> int:
     return fixes_applied
 
 
-def create_pull_request(repo_path: str, repository: Repository, audit: Audit, issues: list) -> tuple:
+def create_pull_request(repo_path: str, repository: Repository, audit: Audit, issues: list, db: Session) -> tuple:
     """
     Create a Pull Request with the fixes.
     
@@ -433,12 +434,21 @@ Issues fixed:
         
         # Push to origin
         # Authenticate with token
-        auth_url = repository.url.replace("https://", f"https://{settings.GITHUB_TOKEN}@")
+        clean_url = repository.url.rstrip("/")
+        auth_url = clean_url.replace("https://", f"https://{settings.GITHUB_TOKEN}@")
         if not auth_url.endswith(".git"):
             auth_url += ".git"
             
         repo.remotes.origin.set_url(auth_url)
-        repo.remotes.origin.push(branch_name)
+        try:
+            repo.remotes.origin.push(branch_name)
+        except git.GitCommandError as e:
+            if "403" in str(e):
+                logger.error(f"Git Push failed with 403: {e}")
+                append_log(audit, db, 'ERROR', '❌ Git Push failed (403 Forbidden). Your GitHub Token likely is missing the "repo" scope. Please regenerate it with "repo" permission.')
+                raise e
+            else:
+                raise e
         
         # Create PR via GitHub API
         pr_title = f"🤖 AutoDev Agent: Fix {len(issues)} issues"
@@ -493,4 +503,9 @@ Please review these changes carefully before merging. While the AI has done its 
         
     except Exception as e:
         logger.error(f"Failed to create PR: {e}")
+        try:
+             # Log the error to the UI logs if we have db access
+             append_log(audit, db, 'ERROR', f'❌ Failed to create Pull Request: {str(e)[:200]}')
+        except:
+             pass
         return None, None
