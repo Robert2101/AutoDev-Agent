@@ -61,7 +61,7 @@ class AuditResponse(BaseModel):
     id: int
     repository_id: int
     status: AuditStatus
-    task_id: str
+    task_id: Optional[str] = None  # Can be None initially
     total_files: int
     processed_files: int
     issues_found: int
@@ -89,7 +89,7 @@ class AuditDetailResponse(AuditResponse):
 class AuditCreateResponse(BaseModel):
     """Schema for audit creation response."""
     audit_id: int
-    task_id: str
+    task_id: Optional[str] = None
     status: AuditStatus
     message: str
 
