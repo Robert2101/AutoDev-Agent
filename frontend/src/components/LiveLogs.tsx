@@ -18,11 +18,17 @@ interface LogEntry {
 export default function LiveLogs({ auditId, status }: LiveLogsProps) {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const logsEndRef = useRef<HTMLDivElement>(null);
+    const logsContainerRef = useRef<HTMLDivElement>(null);
 
-    // Auto-scroll to bottom when new logs arrive
+    // Auto-scroll inside the container when new logs arrive
     const scrollToBottom = () => {
-        logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (logsContainerRef.current) {
+            // Smoothly scroll the log container to the bottom
+            logsContainerRef.current.scrollTo({
+                top: logsContainerRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
     };
 
     useEffect(() => {
@@ -93,7 +99,10 @@ export default function LiveLogs({ auditId, status }: LiveLogsProps) {
 
             {/* Logs Content */}
             {!isCollapsed && (
-                <div className="bg-dark-950/90 p-4 font-mono text-sm max-h-96 overflow-y-auto">
+                <div
+                    ref={logsContainerRef}
+                    className="bg-dark-950/90 p-4 font-mono text-sm max-h-96 overflow-y-auto scroll-smooth"
+                >
                     {logs.length === 0 ? (
                         <div className="text-dark-500 text-center py-8">
                             <Terminal className="w-8 h-8 mx-auto mb-2 opacity-50" />
@@ -114,7 +123,6 @@ export default function LiveLogs({ auditId, status }: LiveLogsProps) {
                                     </span>
                                 </div>
                             ))}
-                            <div ref={logsEndRef} />
                         </div>
                     )}
 

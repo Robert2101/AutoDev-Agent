@@ -162,17 +162,17 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
                 )}
 
                 {/* Rate Limit Warning */}
-                {audit.logs && audit.logs.some(l => l.message && l.message.includes('429')) && (
-                    <div className="mb-8 p-6 bg-yellow-500/10 border border-yellow-500/50 rounded-2xl">
+                {audit.logs && audit.logs.some(l => l.message && (l.message.includes('429') || l.message.includes('quota'))) && (
+                    <div className="mb-8 p-6 bg-red-500/10 border border-red-500/50 rounded-2xl">
                         <div className="flex items-start gap-4">
-                            <Clock className="w-8 h-8 text-yellow-500 flex-shrink-0" />
+                            <Clock className="w-8 h-8 text-red-500 flex-shrink-0" />
                             <div>
-                                <h3 className="text-xl font-bold text-yellow-400 mb-2">AI Agent is Busy (Rate Limit)</h3>
+                                <h3 className="text-xl font-bold text-red-400 mb-2">AI Audit Terminated (Quota Exceeded)</h3>
                                 <p className="text-dark-300 mb-2">
-                                    The AI model usage limit has been exceeded. The agent is waiting for 60 seconds before retrying.
+                                    Your AI model usage limit has been reached. To save resources and prevent blocking other tasks, this audit has been stopped.
                                 </p>
                                 <p className="text-sm text-dark-400">
-                                    Please be patient. The audit will continue automatically.
+                                    Please check your API key quota or try again later.
                                 </p>
                             </div>
                         </div>

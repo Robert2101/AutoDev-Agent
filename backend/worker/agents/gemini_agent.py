@@ -147,9 +147,16 @@ If no issues are found, return: {{"issues": []}}
                 logger.error(f"Response text: {result_text[:500]}")
                 return []
             except Exception as e:
-                if "429" in str(e):
+                err_str = str(e).lower()
+                # If it's a hard quota limit (billing/tier), do NOT retry.
+                # This prevents hanging the worker for other users.
+                if "quota" in err_str or "limit" in err_str:
+                    logger.error(f"AI Quota Exceeded: {e}")
+                    raise e
+
+                if "429" in err_str:
                     if attempt < max_retries - 1:
-                        wait_time = 60  # Wait 1 minute for safe quota reset
+                        wait_time = 60  # Wait for RPM reset
                         logger.warning(f"Rate limited (429). Retrying in {wait_time}s...")
                         time.sleep(wait_time)
                         continue
