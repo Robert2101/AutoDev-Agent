@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bot, Github, Sparkles, RefreshCw, Network, ExternalLink } from 'lucide-react';
+import { Bot, Github, Sparkles, RefreshCw, ExternalLink } from 'lucide-react';
 import RepoForm from '@/components/RepoForm';
 import StatsCard from '@/components/StatsCard';
 import AuditList from '@/components/AuditList';
@@ -69,7 +69,7 @@ export default function HomePage() {
                             </button>
 
                             <a
-                                href="https://github.com/Robert2101/AutoDev-Agent"
+                                href="https://github.com/your-org/autodev-agent"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 px-4 py-2 bg-dark-800/50 hover:bg-dark-700/50 rounded-lg transition-colors"
@@ -87,7 +87,7 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto text-center">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full mb-6">
                         <Sparkles className="w-4 h-4 text-primary-400" />
-                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 2.5 Flash</span>
+                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 2.0 Flash</span>
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-bold text-dark-50 mb-4 text-shadow">
@@ -121,6 +121,52 @@ export default function HomePage() {
                                 <div className="lg:col-span-1 space-y-6">
                                     <RepoForm onAuditCreated={fetchData} />
 
+                                    {/* Related Tools */}
+                                    <div className="glass-card rounded-2xl p-6 border-l-4 border-l-primary-500">
+                                        <h3 className="text-lg font-bold text-dark-50 mb-4 flex items-center gap-2">
+                                            <Sparkles className="w-5 h-5 text-primary-400" />
+                                            Related Exploration Tools
+                                        </h3>
+
+                                        <div className="space-y-6">
+                                            {/* VibeCraft */}
+                                            <div className="space-y-2">
+                                                <h4 className="text-sm font-bold text-dark-100 italic flex items-center gap-2">
+                                                    VibeCraft Vizualizer
+                                                </h4>
+                                                <p className="text-xs text-dark-400 leading-relaxed">
+                                                    Interactive, force-directed dependency graphs revealing the &quot;shape&quot; of your code architecture at a glance.
+                                                </p>
+                                                <a
+                                                    href="https://repo-dig.vercel.app/"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 text-xs font-bold rounded-lg transition-all border border-primary-500/30"
+                                                >
+                                                    Open VibeCraft <ExternalLink className="w-3 h-3" />
+                                                </a>
+                                            </div>
+
+                                            {/* Assignment Planner */}
+                                            <div className="space-y-2 pt-4 border-t border-dark-800/50">
+                                                <h4 className="text-sm font-bold text-dark-100 italic">
+                                                    Assignment Planner Pro
+                                                </h4>
+                                                <p className="text-xs text-dark-400 leading-relaxed">
+                                                    Smart project and assignment planning tool to keep your development workflow organized and on track.
+                                                </p>
+                                                <a
+                                                    href="https://spectacular-gumdrop-c2c3c7.netlify.app/"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-bold rounded-lg transition-all border border-purple-500/30"
+                                                >
+                                                    Plan Assignments <ExternalLink className="w-3 h-3" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* How It Works Guide */}
                                     <div className="glass-card rounded-2xl p-6">
                                         <h3 className="text-lg font-bold text-dark-50 mb-4 flex items-center gap-2">
@@ -134,7 +180,7 @@ export default function HomePage() {
                                             </li>
                                             <li className="flex gap-2">
                                                 <span className="text-primary-400 font-bold">2.</span>
-                                                <span><strong className="text-white">AI Analysis</strong>: Gemini 2.5 Flash scans for bugs & security issues.</span>
+                                                <span><strong className="text-white">AI Analysis</strong>: Gemini 2.0 Flash scans for bugs & security issues.</span>
                                             </li>
                                             <li className="flex gap-2">
                                                 <span className="text-primary-400 font-bold">3.</span>
@@ -145,36 +191,6 @@ export default function HomePage() {
                                                 <span><strong className="text-white">Pull Request</strong>: A PR is automatically created with fixes!</span>
                                             </li>
                                         </ul>
-
-                                        <div className="mt-4 pt-4 border-t border-dark-700/50">
-                                            <p className="text-xs text-dark-500">
-                                                <strong>New Features:</strong><br />
-                                                • Smart Branch Detection<br />
-                                                • Live Terminal Logs<br />
-                                                • Delete bad audits easily
-                                            </p>
-                                        </div>
-                                    </div>
-                                    {/* VibeCraft Integration */}
-                                    <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <div className="p-2 bg-indigo-500/20 rounded-lg">
-                                                <Network className="w-5 h-5 text-indigo-400" />
-                                            </div>
-                                            <h3 className="text-lg font-bold text-dark-50">VibeCraft Visualizer</h3>
-                                        </div>
-                                        <p className="text-sm text-dark-300 mb-4 leading-relaxed">
-                                            A powerful codebase visualization tool that generates an interactive, force-directed dependency graph to reveal the &quot;shape&quot; of your code.
-                                        </p>
-                                        <a
-                                            href="https://repo-dig.vercel.app/"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-indigo-500/20 group"
-                                        >
-                                            <span>Visualize Codebase</span>
-                                            <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                        </a>
                                     </div>
                                 </div>
 
