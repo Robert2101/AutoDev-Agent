@@ -14,7 +14,8 @@ from worker.worker import celery_app
 from app.core.database import SessionLocal
 from app.core.config import settings
 from app.models import Audit, Repository, Issue, AuditStatus, IssueType, IssueSeverity
-from worker.agents import gemini_agent, github_service
+from worker.agents.gemini_agent import GeminiAgent, gemini_agent
+from worker.agents.github_service import GitHubService, github_service
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ def append_log(audit, db, level: str, message: str):
 
 
 @celery_app.task(base=AuditTask, bind=True, name="worker.tasks.audit_task.process_repository_audit")
-def process_repository_audit(self, audit_id: int, **kwargs):
+def process_repository_audit(self, audit_id: int, github_token: str = None, gemini_api_key: str = None, **kwargs):
     """
     Main task to process a repository audit.
     
@@ -112,6 +113,11 @@ def process_repository_audit(self, audit_id: int, **kwargs):
     if not audit:
         logger.error(f"Audit {audit_id} not found")
         return
+        
+    # Select AI Agent
+    agent = gemini_agent
+    if gemini_api_key:
+        agent = GeminiAgent(api_key=gemini_api_key)
     
     repository = audit.repository
     clone_path = None
@@ -159,7 +165,7 @@ def process_repository_audit(self, audit_id: int, **kwargs):
                 rel_path = os.path.relpath(file_path, clone_path)
                 
                 # Analyze with Gemini
-                issues = gemini_agent.analyze_file(rel_path, content, language)
+                issues = agent.analyze_file(rel_path, content, language)
                 
                 # Save issues to database
                 for issue_data in issues:
@@ -212,7 +218,8 @@ def process_repository_audit(self, audit_id: int, **kwargs):
                 repository,
                 audit,
                 all_issues,
-                db
+                db,
+                github_token=github_token
             )
             
             if pr_url:
@@ -391,7 +398,7 @@ def apply_fixes(repo_path: str, issues: list) -> int:
     return fixes_applied
 
 
-def create_pull_request(repo_path: str, repository: Repository, audit: Audit, issues: list, db: Session) -> tuple:
+def create_pull_request(repo_path: str, repository: Repository, audit: Audit, issues: list, db: Session, github_token: str = None) -> tuple:
     """
     Create a Pull Request with the fixes.
     
@@ -434,8 +441,9 @@ Issues fixed:
         
         # Push to origin
         # Authenticate with token
+        token = github_token or settings.GITHUB_TOKEN
         clean_url = repository.url.rstrip("/")
-        auth_url = clean_url.replace("https://", f"https://{settings.GITHUB_TOKEN}@")
+        auth_url = clean_url.replace("https://", f"https://{token}@")
         if not auth_url.endswith(".git"):
             auth_url += ".git"
             
@@ -491,7 +499,9 @@ Please review these changes carefully before merging. While the AI has done its 
 """
         
         # Create PR
-        pr_url, pr_number = github_service.create_pull_request(
+        gh_svc = GitHubService(token=token) if github_token else github_service
+        
+        pr_url, pr_number = gh_svc.create_pull_request(
             repo_full_name=f"{repository.owner}/{repository.name}",
             branch_name=branch_name,
             title=pr_title,

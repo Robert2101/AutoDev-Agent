@@ -28,8 +28,13 @@ class GeminiAgent:
     - Automated fix generation
     """
     
-    def __init__(self):
+    def __init__(self, api_key: Optional[str] = None):
         """Initialize the Gemini AI model."""
+        if api_key:
+            genai.configure(api_key=api_key)
+        else:
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            
         self.model = genai.GenerativeModel('gemini-2.5-flash')
         
         # System prompt with Chain of Thought structure

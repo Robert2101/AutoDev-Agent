@@ -15,6 +15,8 @@ class RepositoryCreate(BaseModel):
     """Schema for creating a repository audit request."""
     url: str = Field(..., description="GitHub repository URL")
     branch: Optional[str] = Field(default="main", description="Branch to analyze")
+    github_token: Optional[str] = Field(default=None, description="Custom GitHub Token for this audit")
+    gemini_api_key: Optional[str] = Field(default=None, description="Custom Gemini API Key for this audit")
 
 
 class RepositoryResponse(BaseModel):

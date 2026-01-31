@@ -85,7 +85,7 @@ async def create_audit(
     db.refresh(audit)
     
     # Queue the audit task
-    task = process_repository_audit.delay(audit.id)
+    task = process_repository_audit.delay(audit.id, repo_data.github_token, repo_data.gemini_api_key)
     
     # Update audit with task ID
     audit.task_id = task.id

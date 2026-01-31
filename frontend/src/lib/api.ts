@@ -72,8 +72,12 @@ export interface Statistics {
 // API Functions
 export const auditAPI = {
     // Create a new audit
-    createAudit: async (url: string, branch: string = 'main') => {
-        const response = await api.post('/api/audits/', { url, branch });
+    createAudit: async (url: string, branch: string = 'main', github_token?: string, gemini_api_key?: string) => {
+        const payload: any = { url, branch };
+        if (github_token) payload.github_token = github_token;
+        if (gemini_api_key) payload.gemini_api_key = gemini_api_key;
+
+        const response = await api.post('/api/audits/', payload);
         return response.data;
     },
 

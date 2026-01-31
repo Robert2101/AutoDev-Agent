@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Github, Sparkles, AlertCircle } from 'lucide-react';
+import { Github, Sparkles, AlertCircle, Settings, ChevronDown, ChevronUp, Key } from 'lucide-react';
 import { auditAPI } from '@/lib/api';
 
 interface RepoFormProps {
@@ -11,6 +11,12 @@ interface RepoFormProps {
 export default function RepoForm({ onAuditCreated }: RepoFormProps) {
     const [url, setUrl] = useState('');
     const [branch, setBranch] = useState('main');
+
+    // Advanced Settings State
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [githubToken, setGithubToken] = useState('');
+    const [geminiKey, setGeminiKey] = useState('');
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -20,9 +26,13 @@ export default function RepoForm({ onAuditCreated }: RepoFormProps) {
         setLoading(true);
 
         try {
-            await auditAPI.createAudit(url, branch);
+            await auditAPI.createAudit(url, branch, githubToken, geminiKey);
             setUrl('');
             setBranch('main');
+            // Optional: reset keys or keep them
+            setGithubToken('');
+            setGeminiKey('');
+            setShowAdvanced(false);
             onAuditCreated();
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to create audit. Please check the URL and try again.');
@@ -83,6 +93,57 @@ export default function RepoForm({ onAuditCreated }: RepoFormProps) {
                         <p className="text-sm text-red-400">{error}</p>
                     </div>
                 )}
+
+                {/* Advanced Settings Toggle */}
+                <div className="pt-2 border-t border-dark-700/50">
+                    <button
+                        type="button"
+                        onClick={() => setShowAdvanced(!showAdvanced)}
+                        className="flex items-center gap-2 text-sm text-dark-400 hover:text-primary-400 transition-colors"
+                    >
+                        <Settings className="w-4 h-4" />
+                        <span>Advanced Settings (Custom Keys)</span>
+                        {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+
+                    {showAdvanced && (
+                        <div className="mt-4 space-y-4 animate-slide-up p-4 bg-dark-800/50 rounded-lg border border-dark-700/50">
+                            <div>
+                                <label className="block text-xs font-medium text-dark-400 mb-1">
+                                    Custom GitHub Token (Optional)
+                                </label>
+                                <div className="relative">
+                                    <Key className="absolute left-3 top-2.5 w-4 h-4 text-dark-500" />
+                                    <input
+                                        type="password"
+                                        value={githubToken}
+                                        onChange={(e) => setGithubToken(e.target.value)}
+                                        placeholder="ghp_..."
+                                        className="input-field w-full pl-10 text-sm"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-dark-500 mt-1">Overrides system default. Needed for private repos.</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-dark-400 mb-1">
+                                    Custom Gemini API Key (Optional)
+                                </label>
+                                <div className="relative">
+                                    <Sparkles className="absolute left-3 top-2.5 w-4 h-4 text-dark-500" />
+                                    <input
+                                        type="password"
+                                        value={geminiKey}
+                                        onChange={(e) => setGeminiKey(e.target.value)}
+                                        placeholder="AIza..."
+                                        className="input-field w-full pl-10 text-sm"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-dark-500 mt-1">Use your own quota/tier.</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 <button
                     type="submit"

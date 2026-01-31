@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 class GitHubService:
     """Service for interacting with GitHub API."""
     
-    def __init__(self):
+    def __init__(self, token: Optional[str] = None):
         """Initialize GitHub API client."""
-        self.github = Github(settings.GITHUB_TOKEN)
+        self.github = Github(token or settings.GITHUB_TOKEN)
     
     def create_pull_request(
         self,
