@@ -39,12 +39,27 @@ class Settings(BaseSettings):
     
     @model_validator(mode='after')
     def sync_redis_urls(self) -> 'Settings':
-        """Sync Celery URLs with REDIS_URL if not explicitly set."""
-        if self.REDIS_URL != "redis://redis:6379/0":
-            if self.CELERY_BROKER_URL == "redis://redis:6379/0":
-                self.CELERY_BROKER_URL = self.REDIS_URL
-            if self.CELERY_RESULT_BACKEND == "redis://redis:6379/0":
-                self.CELERY_RESULT_BACKEND = self.REDIS_URL
+        """Sync Celery URLs. Use Database if Redis is unavailable (Perfect for Render Free Tier)."""
+        db_url = self.DATABASE_URL
+        
+        # If REDIS_URL is default/localhost, it won't work in the cloud.
+        # Fallback to PostgreSQL as the task broker.
+        is_redis_missing = (
+            not self.REDIS_URL or 
+            "redis:6379" in self.REDIS_URL or 
+            "localhost" in self.REDIS_URL
+        )
+
+        if is_redis_missing:
+            # Use Database for tasks (sqla transport for broker, db transport for results)
+            # This makes the app run on Render Free Tier without needing a Redis service!
+            self.CELERY_BROKER_URL = db_url.replace("postgresql://", "sqla+postgresql://", 1)
+            self.CELERY_RESULT_BACKEND = "db+" + db_url
+        else:
+            # Redis is explicitly set (e.g. Upstash or Render Paid Redis), use it.
+            self.CELERY_BROKER_URL = self.REDIS_URL
+            self.CELERY_RESULT_BACKEND = self.REDIS_URL
+            
         return self
 
     class Config:
