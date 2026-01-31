@@ -1,38 +1,21 @@
-# Build Stage
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /app
 
+# Install dependencies using npm install (safer than ci if lockfile varies)
 COPY package*.json ./
 RUN npm install
 
+# Copy application code
 COPY . .
 
-# Accept API URL as build argument
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-ARG NEXT_PUBLIC_WS_URL
-ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
-
+# Build the application (Standalone mode)
 RUN npm run build
 
-# Production Stage (Nginx)
-FROM nginx:alpine
+# Expose port
+EXPOSE 3000
 
-# Copy built static files
-COPY --from=builder /app/out /usr/share/nginx/html
-
-# Configure Nginx for SPA (Single Page App) routing
-# Redirects all 404s to index.html so React Router handles them
-RUN echo 'server { \
-    listen 80; \
-    location / { \
-    root /usr/share/nginx/html; \
-    index index.html index.htm; \
-    try_files $uri $uri/ /index.html; \
-    } \
-    }' > /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start production server
+# Note: standalone folder is at .next/standalone, but 'npm start' works fine 
+# and is easier to configure with default next.config.js
+CMD ["npm", "start"]
