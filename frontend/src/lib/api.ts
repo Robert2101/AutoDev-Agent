@@ -51,6 +51,7 @@ export interface Audit {
     created_at: string;
     started_at?: string;
     completed_at?: string;
+    logs?: any[];
 }
 
 export interface AuditDetail extends Audit {

@@ -81,6 +81,7 @@ class AuditDetailResponse(AuditResponse):
     """Schema for detailed audit response with issues."""
     repository: RepositoryResponse
     issues: List[IssueResponse] = []
+    logs: Optional[List[dict]] = []  # Added logs field
     
     class Config:
         from_attributes = True

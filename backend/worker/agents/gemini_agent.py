@@ -29,7 +29,7 @@ class GeminiAgent:
     
     def __init__(self):
         """Initialize the Gemini AI model."""
-        self.model = genai.GenerativeModel('gemini-1.5-pro')
+        self.model = genai.GenerativeModel('gemini-pro')
         
         # System prompt with Chain of Thought structure
         self.system_prompt = """You are a Senior Software Engineer with expertise in:
