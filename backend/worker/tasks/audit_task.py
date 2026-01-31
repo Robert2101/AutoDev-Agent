@@ -200,7 +200,15 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
                 
             except Exception as e:
                 logger.error(f"Error analyzing {file_path}: {e}")
+                err_str = str(e).lower()
                 append_log(audit, db, 'ERROR', f'❌ Error analyzing {os.path.basename(file_path)}: {str(e)[:100]}...')
+                
+                # If we hit a quota or persistent rate limit error, stop the entire audit
+                # to prevent looping errors for every single file.
+                if "429" in err_str or "quota" in err_str or "limit" in err_str:
+                    logger.error("Quota exceeded or persistent rate limit hit. Terminating audit.")
+                    raise e
+                    
                 continue
         
         # Step 3: Apply fixes
