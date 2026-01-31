@@ -16,10 +16,7 @@ services:
           name: autodev-db
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: autodev-redis
-          property: connectionString
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: GITHUB_TOKEN
@@ -47,10 +44,7 @@ services:
           name: autodev-db
           property: connectionString
       - key: REDIS_URL
-        fromService:
-          type: redis
-          name: autodev-redis
-          property: connectionString
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: GITHUB_TOKEN
