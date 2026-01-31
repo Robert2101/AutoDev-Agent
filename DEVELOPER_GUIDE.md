@@ -3,12 +3,19 @@
 Everything you need to run, modify, and understand the project workflow.
 
 ## 🚀 One-Button Start
-To start the entire system (Backend, Frontend, DB, Redis, Worker):
 
+### Mac / Linux
 ```bash
 ./start.sh
 ```
-Or manually:
+
+### Windows
+Double-click `start.bat` or run in Command Prompt:
+```cmd
+start.bat
+```
+
+Or manually (Any OS):
 ```bash
 docker-compose up -d
 ```

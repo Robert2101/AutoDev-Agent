@@ -73,6 +73,12 @@ Or use the quick start script:
 ./start.sh
 ```
 
+### Windows Users
+Use the `start.bat` script:
+```cmd
+start.bat
+```
+
 ## ❓ Important Notes
 
 ### Do I need PostgreSQL or Redis installed locally?
