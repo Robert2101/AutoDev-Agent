@@ -7,8 +7,14 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
 # Create SQLAlchemy engine
+# On cloud platforms like Render, we often need to specify SSL mode
+connect_args = {}
+if "render.com" in settings.DATABASE_URL or "localhost" not in settings.DATABASE_URL:
+    connect_args = {"sslmode": "require"}
+
 engine = create_engine(
     settings.DATABASE_URL,
+    connect_args=connect_args,
     pool_pre_ping=True,  # Verify connections before using
     pool_size=10,
     max_overflow=20
