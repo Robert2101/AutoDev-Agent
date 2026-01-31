@@ -180,7 +180,7 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
                 rel_path = os.path.relpath(file_path, clone_path)
                 
                 # Analyze with Gemini
-                issues = agent.analyze_file(rel_path, content, language)
+                issues = agent.analyze_file(rel_path, content, language, audit=audit, db=db)
                 
                 # Save issues to database
                 for issue_data in issues:

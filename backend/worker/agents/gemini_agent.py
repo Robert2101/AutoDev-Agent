@@ -30,10 +30,8 @@ class GeminiAgent:
     
     def __init__(self, api_key: Optional[str] = None):
         """Initialize the Gemini AI model."""
-        if api_key:
-            genai.configure(api_key=api_key)
-        else:
-            genai.configure(api_key=settings.GEMINI_API_KEY)
+        self._api_key = api_key or settings.GEMINI_API_KEY
+        genai.configure(api_key=self._api_key)
             
         self.model = genai.GenerativeModel('gemini-2.0-flash')
         
@@ -91,22 +89,17 @@ Issue types: syntax_error, logic_error, security_vulnerability, code_smell, perf
 Severity levels: low, medium, high, critical
 """
     
-    def analyze_file(self, file_path: str, file_content: str, language: str) -> List[Dict]:
+    def analyze_file(self, file_path: str, file_content: str, language: str, audit=None, db=None) -> List[Dict]:
         """
         Analyze a single file and detect issues.
-        
-        Args:
-            file_path: Path to the file being analyzed
-            file_content: Content of the file
-            language: Programming language of the file
-            
-        Returns:
-            List of detected issues
         """
         max_retries = 3
         
         for attempt in range(max_retries):
             try:
+                # Ensure the correct key is configured before every call
+                genai.configure(api_key=self._api_key)
+                
                 prompt = f"""{self.system_prompt}
 
 **File to Analyze**: {file_path}
@@ -149,25 +142,20 @@ If no issues are found, return: {{"issues": []}}
             except Exception as e:
                 err_str = str(e).lower()
                 
-                # Fingerprint the key for debugging (first 4 and last 4)
-                current_key = "Default Key"
-                try:
-                    # Accessing private attribute to help user debug their key
-                    raw_key = genai.get_default_metadata_attributes().get('api_key', 'Unknown')
-                    if raw_key and len(raw_key) > 8:
-                        current_key = f"{raw_key[:4]}...{raw_key[-4:]}"
-                except:
-                    pass
+                # Fingerprint the key for debugging
+                current_key = f"{self._api_key[:4]}...{self._api_key[-4:]}" if self._api_key and len(self._api_key) > 8 else "Unknown"
 
-                # 429 Handling (Quota and Rate Limits)
+                # 429 Handling
                 if "429" in err_str:
-                    # Log which key is hitting the limit
-                    logger.warning(f"Rate Limit/Quota hit (429) using key: {current_key}")
+                    msg = f"Rate Limit/Quota hit (429) using key: {current_key}"
+                    logger.warning(msg)
                     
-                    # If it's a very clear billing error, fail on the second attempt
-                    # but give it at least ONE retry just in case Google's API is glitching
+                    if audit and db:
+                        from worker.tasks.audit_task import append_log
+                        append_log(audit, db, 'WARNING', f'⏳ {msg}. Retrying...')
+
                     if ("billing" in err_str or "plan" in err_str) and attempt > 0:
-                        logger.error(f"AI Quota Exceeded (Hard Billing/Plan Limit): {e}")
+                        logger.error(f"AI Quota Exceeded (Hard Limit): {e}")
                         raise e
 
                     if attempt < max_retries - 1:
@@ -179,6 +167,7 @@ If no issues are found, return: {{"issues": []}}
                 logger.error(f"Error analyzing {file_path}: {e}")
                 if attempt == max_retries - 1:
                     raise e
+        return []
         return []
     
     def scan_for_secrets(self, file_content: str) -> List[Dict]:
