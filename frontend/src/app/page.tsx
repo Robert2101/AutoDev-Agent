@@ -116,16 +116,50 @@ export default function HomePage() {
                                     <StatsCard stats={stats} />
                                 </div>
                             )}
-
                             <div className="grid lg:grid-cols-3 gap-8">
                                 {/* Submission Form */}
-                                <div className="lg:col-span-1">
+                                <div className="lg:col-span-1 space-y-6">
                                     <RepoForm onAuditCreated={fetchData} />
+
+                                    {/* How It Works Guide */}
+                                    <div className="glass-card rounded-2xl p-6">
+                                        <h3 className="text-lg font-bold text-dark-50 mb-4 flex items-center gap-2">
+                                            <Sparkles className="w-5 h-5 text-yellow-400" />
+                                            How It Works
+                                        </h3>
+                                        <ul className="space-y-3 text-sm text-dark-300">
+                                            <li className="flex gap-2">
+                                                <span className="text-primary-400 font-bold">1.</span>
+                                                <span><strong className="text-white">Submit Repo</strong>: Enter any public GitHub URL. We auto-detect the branch.</span>
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <span className="text-primary-400 font-bold">2.</span>
+                                                <span><strong className="text-white">AI Analysis</strong>: Gemini 1.5 Pro scans for bugs & security issues.</span>
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <span className="text-primary-400 font-bold">3.</span>
+                                                <span><strong className="text-white">Auto-Fix</strong>: The agent generates fixes and validates them.</span>
+                                            </li>
+                                            <li className="flex gap-2">
+                                                <span className="text-primary-400 font-bold">4.</span>
+                                                <span><strong className="text-white">Pull Request</strong>: A PR is automatically created with fixes!</span>
+                                            </li>
+                                        </ul>
+
+                                        <div className="mt-4 pt-4 border-t border-dark-700/50">
+                                            <p className="text-xs text-dark-500">
+                                                <strong>New Features:</strong><br />
+                                                • Smart Branch Detection<br />
+                                                • Live Terminal Logs<br />
+                                                • Delete bad audits easily
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Audit List */}
                                 <div className="lg:col-span-2">
-                                    <AuditList audits={audits} />
+                                    <AuditList audits={audits} onRefresh={fetchData} />
                                 </div>
                             </div>
                         </>
