@@ -124,6 +124,70 @@ Our system prompts enforce a 3-step reasoning process:
 ### 3. Structural Output Enforcement
 We use **JSON Schema Mode** to ensure the AI never returns free-form text that would break the automated PR engine. Every response is a valid JSON object that the worker can parse and apply.
 
+### 4. Advanced Orchestration & Reasoning
+DevSynapse's true power lies in its multi-layered prompt architecture. We don't just send code to an LLM; we wrap it in a sophisticated execution environment.
+
+#### A. The Semantic Filtering Layer (RAG-Lite)
+Before any AI processing happens, the worker performs a lexicographical scan of the repository. 
+*   **Relevance Scoring**: Files are scored based on their extension and position in the directory tree.
+*   **Dependency Pruning**: Using `ignore` patterns similar to `.gitignore`, we ensure that binary blobs, build artifacts, and vendor files never consume AI context window tokens.
+
+#### B. The Structured Thinking Protocol (STP)
+Every analysis request follows a strict **Structured Thinking Protocol**:
+1.  **Context Injection**: The AI is provided with a "Developer Identity" (Senior Security Engineer) and a specific mission objective.
+2.  **Constraint Satisfaction**: The prompt includes negative constraints (e.g., "Do NOT use deprecated libraries," "Do NOT change functionality").
+3.  **Cross-File Correlation**: When analyzing a specific file, the agent is often provided with "Context Snippets" from related headers or configuration files to understand local coding standards.
+
+#### C. Validation & Self-Correction
+Once the AI generates a fix, it undergoes a **Post-Generation Validation**:
+*   **Syntactic Checker**: The worker attempts to parse the suggested code snippet. If it fails, the agent is re-queried with the specific error message to "self-correct" the fix.
+*   **Style Matching**: The agent reviews the original file's indentation (tabs vs spaces) and naming conventions to ensure the fix looks like it was written by the original author.
+
+---
+
+## 🎯 Prompt Engineering Strategy: The Deep Dive
+
+### 1. Zero-Shot Code Intelligence
+We leverage **Gemini 2.0 Flash's** inherent deep-learning weights for zero-shot bug detection. By providing a high-authority system prompt, we force the model to look past superficial syntax and analyze logic flow.
+*   **Variable Tainting**: The agent is prompted to track user-controlled input (from APIs or Forms) through the code to detect "Taint-Sink" vulnerabilities like SQL Injection.
+*   **Concurrency Analysis**: Special prompts are used for files containing `async`, `await`, or `threading` to look specifically for race conditions.
+
+### 2. High-Fidelity JSON Schema Enforcement
+To ensure seamless integration with our automated PR engine, we use a "Schema-First" prompt strategy. 
+*   **Strict Output Mode**: The AI is instructed that any non-JSON content in its output is a critical failure.
+*   **Payload Structure**:
+    ```json
+    {
+      "analysis": {
+        "summary": "Brief overview of file health",
+        "health_score": 1-100
+      },
+      "issues": [
+        {
+          "type": "logic_error",
+          "severity": "high",
+          "location": "L42-L48",
+          "fix_code": "...",
+          "rationale": "Why this specific fix was chosen"
+        }
+      ]
+    }
+    ```
+
+### 3. Contextual RAG & Sliding Windows
+For large files that exceed the high-density reasoning window, DevSynapse employs a **Sliding Context Window**:
+*   **Overlap Analysis**: Files are broken into chunks with a 20% overlap, ensuring that issues defined at chunk boundaries (like a function starting in one chunk and ending in another) are never missed.
+*   **Global Summary Injection**: A high-level summary of the entire file is injected into every chunk's prompt to maintain "Global Vision."
+
+### 4. Behavioral "Identity" Prompting
+We use different "Personas" for different stages of the audit:
+*   **The Auditor Persona**: Focused on finding flaws, being cynical of input, and suspecting security gaps.
+*   **The Architect Persona**: Focused on code smells, design patterns, and efficiency.
+*   **The Refactor Persona**: Focused on generating the cleanest, most idiomatic fix possible.
+
+### 5. Multi-Agent Feedback Loop
+In complex scenarios, the results from the **Auditor** are fed into the **Architect** for a second opinion. This "Debate Mode" significantly reduces False Positives and ensures that only valid, high-impact issues are reported to the developer.
+
 ---
 
 ## 🏁 Setup & Installation Guide
