@@ -207,7 +207,11 @@ def process_repository_audit(self, audit_id: int, **kwargs):
 
 def clone_repository(url: str, branch: str) -> str:
     """
-    Clone a repository to local storage.
+    Clone a repository to local storage with automatic branch fallback.
+    
+    If the specified branch doesn't exist, tries common alternatives:
+    - If 'main' fails, tries 'master'
+    - If 'master' fails, tries 'main'
     
     Args:
         url: Repository URL
@@ -226,9 +230,42 @@ def clone_repository(url: str, branch: str) -> str:
     
     logger.info(f"Cloning {url} to {clone_path}")
     
-    git.Repo.clone_from(url, clone_path, branch=branch, depth=1)
-    
-    return clone_path
+    # Try to clone with specified branch
+    try:
+        git.Repo.clone_from(url, clone_path, branch=branch, depth=1)
+        logger.info(f"Successfully cloned branch '{branch}'")
+        return clone_path
+    except git.GitCommandError as e:
+        # Check if error is due to branch not found
+        if "Remote branch" in str(e) and "not found" in str(e):
+            logger.warning(f"Branch '{branch}' not found, trying fallback branches...")
+            
+            # Determine fallback branch
+            fallback_branches = []
+            if branch == 'main':
+                fallback_branches = ['master', 'develop', 'dev']
+            elif branch == 'master':
+                fallback_branches = ['main', 'develop', 'dev']
+            else:
+                fallback_branches = ['main', 'master']
+            
+            # Try each fallback branch
+            for fallback in fallback_branches:
+                try:
+                    logger.info(f"Attempting to clone with branch '{fallback}'...")
+                    git.Repo.clone_from(url, clone_path, branch=fallback, depth=1)
+                    logger.info(f"✅ Successfully cloned using fallback branch '{fallback}'")
+                    return clone_path
+                except git.GitCommandError:
+                    logger.warning(f"Branch '{fallback}' also not found")
+                    continue
+            
+            # If all fallbacks failed, raise the original error
+            logger.error(f"All branch attempts failed for {url}")
+            raise
+        else:
+            # Some other git error, re-raise it
+            raise
 
 
 def discover_files(repo_path: str) -> list:
