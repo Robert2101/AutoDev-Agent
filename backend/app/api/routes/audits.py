@@ -85,11 +85,22 @@ async def create_audit(
     db.refresh(audit)
     
     # Queue the audit task
-    task = process_repository_audit.delay(audit.id, repo_data.github_token, repo_data.gemini_api_key)
-    
-    # Update audit with task ID
-    audit.task_id = task.id
-    db.commit()
+    try:
+        task = process_repository_audit.delay(audit.id, repo_data.github_token, repo_data.gemini_api_key)
+        # Update audit with task ID
+        audit.task_id = task.id
+        db.commit()
+    except Exception as e:
+        # Graceful failure if Redis/Queue is down
+        import logging
+        logging.error(f"Failed to queue task: {str(e)}")
+        audit.status = AuditStatus.FAILED
+        audit.error_message = f"Queue Error: {str(e)}"
+        db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Task queue is currently unavailable. Please check backend logs."
+        )
     
     return AuditCreateResponse(
         audit_id=audit.id,

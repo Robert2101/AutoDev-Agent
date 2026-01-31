@@ -51,12 +51,14 @@ class Settings(BaseSettings):
         )
 
         if is_redis_missing:
-            # Use Database for tasks (sqla transport for broker, db transport for results)
-            # This makes the app run on Render Free Tier without needing a Redis service!
+            # Use Database for tasks
             self.CELERY_BROKER_URL = db_url.replace("postgresql://", "sqla+postgresql://", 1)
             self.CELERY_RESULT_BACKEND = "db+" + db_url
         else:
-            # Redis is explicitly set (e.g. Upstash or Render Paid Redis), use it.
+            # Redis is explicitly set. If it's Upstash, ensure we use SSL (rediss://)
+            if "upstash.io" in self.REDIS_URL.lower() and self.REDIS_URL.startswith("redis://"):
+                self.REDIS_URL = self.REDIS_URL.replace("redis://", "rediss://", 1)
+            
             self.CELERY_BROKER_URL = self.REDIS_URL
             self.CELERY_RESULT_BACKEND = self.REDIS_URL
             
