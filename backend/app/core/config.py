@@ -34,7 +34,6 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     
     # CORS
-    # CORS
     CORS_ORIGINS: list = ["*"]
     
     class Config:
