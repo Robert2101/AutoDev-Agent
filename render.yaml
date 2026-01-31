@@ -1,0 +1,86 @@
+services:
+  # ----------------------------------------------------------------------------
+  # BACKEND SERVICE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: autodev-backend
+    env: docker
+    plan: free
+    region: oregon
+    dockerContext: ./backend
+    dockerfilePath: backend/Dockerfile
+    numInstances: 1
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: autodev-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: autodev-redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: 8000
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    healthCheckPath: /docs
+
+  # ----------------------------------------------------------------------------
+  # WORKER SERVICE
+  # ----------------------------------------------------------------------------
+  - type: worker
+    name: autodev-worker
+    env: docker
+    plan: free
+    region: oregon
+    dockerContext: ./backend
+    dockerfilePath: backend/Dockerfile.worker
+    numInstances: 1
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: autodev-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: autodev-redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+
+  # ----------------------------------------------------------------------------
+  # FRONTEND SERVICE
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: autodev-frontend
+    env: docker
+    plan: free
+    region: oregon
+    dockerContext: ./frontend
+    dockerfilePath: frontend/Dockerfile
+    numInstances: 1
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: autodev-backend
+          property: url
+
+databases:
+  - name: autodev-db
+    plan: free
+    databaseName: autodev
+    user: autodev
+
+# Note: Render may require a paid plan for Redis. 
+# If so, you can use an external Redis (e.g., Upstash) and set REDIS_URL manually.
+# For simplicity, we define a service here, but users typically assume defaults.
