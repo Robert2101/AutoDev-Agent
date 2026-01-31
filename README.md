@@ -3,272 +3,173 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-green)](https://www.python.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-purple)](https://deepmind.google/technologies/gemini/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-> An autonomous AI agent that audits GitHub repositories, detects bugs and security vulnerabilities using the Gemini API, and automatically opens Pull Requests with code fixes.
+> **An autonomous AI agent that audits GitHub repositories, detects bugs & security vulnerabilities using Google Gemini 2.5 Flash, and automatically opens Pull Requests with fixed code.**
 
-## 🎯 Elevator Pitch
+---
+
+## 🎯 What is AutoDev Agent?
 
 Imagine a world where bugs fix themselves. **AutoDev Agent** is an autonomous AI-powered system that:
 
-- 🔍 **Audits** your GitHub repositories automatically
-- 🐛 **Detects** bugs, security vulnerabilities, and code smells
-- 🤖 **Fixes** issues using Gemini 1.5 Pro AI
-- 🔄 **Opens** Pull Requests with verified fixes
-- ✅ **Validates** fixes before proposing changes
+- 🔍 **Audits** your GitHub repositories automatically.
+- 🐛 **Detects** bugs, security vulnerabilities, and code smells.
+- 🤖 **Fixes** issues using state-of-the-art **Gemini 2.5 Flash** AI.
+- 🔄 **Opens** Pull Requests with verified fixes.
+- 🔐 **Secure** handling of credentials and API keys.
 
-## 🏗️ Architecture
+---
 
-```
-┌──────────────┐      ┌──────────────┐      ┌──────────────┐
-│   Next.js    │─────▶│   FastAPI    │─────▶│    Redis     │
-│   Frontend   │      │   Backend    │      │    Queue     │
-└──────────────┘      └──────────────┘      └──────────────┘
-                                                    │
-                                                    ▼
-                                             ┌──────────────┐
-                                             │    Celery    │
-                                             │    Worker    │
-                                             └──────────────┘
-                                                    │
-                                                    ▼
-                                             ┌──────────────┐
-                                             │   Gemini     │
-                                             │   1.5 Pro    │
-                                             └──────────────┘
-```
+## 🚀 Key Features
 
-### Task Queue Architecture
+### 1. Multi-User & Dynamic Configuration
+- **Custom API Keys**: Users can provide their own `GitHub Token` and `Gemini API Key` for specific audits via the "Advanced Settings" UI.
+- **Privacy First**: Credentials are used only for the requested audit and not stored permanently if passed dynamicallly.
 
-Instead of synchronous processing (user waiting on loading screen), we use a **message queue**:
+### 2. Intelligent Context & RAG
+- Skips irrelevant files (`node_modules`, `.git`, `dist`).
+- Prioritizes source code analysis based on language (`.py`, `.js`, `.ts`, `.go`, `.rs`, etc.).
 
-1. **User Input**: Submit GitHub URL via frontend
-2. **Queueing**: Backend pushes job to Redis
-3. **Worker Execution**: Background worker processes the repository
-4. **Validation**: Worker verifies fixes don't break the build
-5. **Action**: Creates branch and opens Pull Request
-6. **Notification**: User notified via WebSocket
+### 3. Automated PR Creation
+- **Safety Valve**: Never commits directly to `main`.
+- Creates isolated branches (e.g., `fix/ai-auto-patch-ID`).
+- Push changes and opens a PR with a detailed summary.
 
-## 🚀 Tech Stack
+### 4. Robust Error Handling
+- **Rate Limit Handling**: Automatically pauses and retries (Exponential Backoff) if AI quotas are exceeded.
+- **Auth Diagnostics**: Detects permission errors (e.g., missing `repo` scope) and guides users to fix them.
 
-### Frontend
-- **Next.js 14** - Modern React framework
-- **TailwindCSS** - Utility-first styling
-- **Socket.io** - Real-time updates
-- **Framer Motion** - Smooth animations
-
-### Backend
-- **FastAPI** - High-performance Python API
-- **PostgreSQL** - Robust database
-- **Redis + Celery** - Task queue system
-- **SQLAlchemy** - ORM
-
-### AI & Integrations
-- **Google Gemini 2.5 Flash** - Large context window for code analysis
-- **PyGithub** - GitHub API integration
-
-### DevOps
-- **Docker Compose** - Multi-container orchestration
-- **Git** - Version control with conventional commits
-
-## 📁 Project Structure
-
-```
-autodev-agent/
-├── frontend/                 # Next.js application
-│   ├── src/
-│   │   ├── app/             # App router pages
-│   │   ├── components/      # React components
-│   │   └── lib/             # Utilities
-│   └── Dockerfile
-│
-├── backend/                  # FastAPI application
-│   ├── app/
-│   │   ├── api/             # API routes
-│   │   ├── core/            # Configuration
-│   │   ├── models/          # Database models
-│   │   └── services/        # Business logic
-│   └── Dockerfile
-│
-├── worker/                   # Celery worker
-│   ├── tasks/               # Background tasks
-│   └── agents/              # AI agent logic
-│
-├── docker-compose.yml
-└── README.md
-```
-
-## 🎨 Key Features
-
-### 1. Intelligent Context Retrieval (RAG)
-- Skips irrelevant files (node_modules, .git, images)
-- Reads package.json/requirements.txt for dependency awareness
-- Priority-based file processing
-
-### 2. Safety Valve (Pull Request vs. Commit)
-- **Never commits directly to main**
-- Creates feature branches (e.g., `fix/ai-auto-patch-001`)
-- Opens Pull Requests for human review
-
-### 3. Secret Scanning
-- Detects hardcoded API keys
-- Identifies exposed credentials
-- Scans for SQL injection vulnerabilities
-
-### 4. Code Validation
-- Runs build/lint commands before PR
-- Ensures fixes don't break the build
-- Rollback on validation failure
+---
 
 ## 🔧 Setup & Installation
 
 ### Prerequisites
-- Docker & Docker Compose
-- Git
-- Gemini API Key
-- GitHub Personal Access Token
+1.  **Docker Desktop** (Running).
+2.  **Git** installed.
+3.  **Google Gemini API Key** ([Get it here](https://makersuite.google.com/app/apikey)).
+4.  **GitHub Personal Access Token** ([Get it here](https://github.com/settings/tokens)).
+    -   **Required Scope**: `repo` (Full control of private repositories).
 
-### Quick Start
-
-1. **Clone the repository**
+### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/yourusername/autodev-agent.git
+git clone https://github.com/your-org/autodev-agent.git
 cd autodev-agent
 ```
 
-2. **Configure environment**
+### Step 2: Configure Environment
+Create a `.env` file in the root directory:
+
 ```bash
-cp .env.example .env
-# Edit .env with your API keys
+# Copy example file (if available) or create new
+touch .env
 ```
 
-3. **Start with Docker Compose**
-```bash
-docker-compose up --build
-```
-
-4. **Access the application**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-## 📖 Usage
-
-1. Navigate to http://localhost:3000
-2. Enter a GitHub repository URL
-3. Click "Analyze Repository"
-4. Monitor real-time progress
-5. Review the Pull Request created by the agent
-
-## 🧠 Prompt Engineering Strategy
-
-The agent uses a **Chain of Thought** approach:
-
-```
-You are a Senior Software Engineer. I am providing you with a file server.js.
-
-1. Analyze the code for logic errors, race conditions, or syntax errors.
-2. Explain the bug strictly.
-3. Provide the full corrected code block.
-4. Do not remove comments unless necessary.
-```
-
-## 🐳 Docker Services
-
-| Service    | Port | Description                    |
-|------------|------|--------------------------------|
-| Frontend   | 3000 | Next.js web application        |
-| Backend    | 8000 | FastAPI server                 |
-| Worker     | -    | Celery background worker       |
-| Redis      | 6379 | Message broker                 |
-| PostgreSQL | 5432 | Database                       |
-
-## 🔐 Environment Variables
+**Add the following content to `.env`:**
 
 ```env
-# Backend
-DATABASE_URL=postgresql://user:pass@db:5432/autodev
-REDIS_URL=redis://redis:6379/0
-GEMINI_API_KEY=your_gemini_api_key
-GITHUB_TOKEN=your_github_token
+# AI Configuration
+GEMINI_API_KEY=AIzaSy...your-gemini-key
 
-# Frontend
+# GitHub Configuration
+GITHUB_TOKEN=ghp_...your-github-token
+
+# Database & Infrastructure
+POSTGRES_USER=autodev
+POSTGRES_PASSWORD=autodev_password
+POSTGRES_DB=autodev_db
+DATABASE_URL=postgresql://autodev:autodev_password@db:5432/autodev_db
+REDIS_URL=redis://redis:6379/0
+
+# App Configuration
+SECRET_KEY=your-super-secret-key-change-this
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## 🛠️ Development
+---
 
-### Backend Development
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+## ⚡ How to Run
+
+We provide automated scripts for a "One-Button" start experience on all platforms.
+
+### 🪟 Windows Users
+Double-click `start.bat` or run in Command Prompt:
+
+```cmd
+.\start.bat
 ```
 
-### Frontend Development
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Worker Development
-```bash
-cd backend
-celery -A worker.worker worker --loglevel=info
-```
-
-## 🧪 Testing
+### 🍎 Mac / 🐧 Linux Users
+Run the shell script:
 
 ```bash
-# Backend tests
-cd backend
-pytest
-
-# Frontend tests
-cd frontend
-npm test
+./start.sh
 ```
 
-## 📊 Success Metrics
+### 🐳 Manual Method
+If you prefer running Docker Compose directly:
 
-- ✅ Successfully clone and analyze repositories
-- ✅ Detect syntax, logic, and security bugs
-- ✅ Generate valid code fixes
-- ✅ Create Pull Requests automatically
-- ✅ Provide real-time status updates
-- ✅ Handle errors gracefully
-
-## 🚧 Roadmap
-
-- [ ] Multi-language support (JS, Python, Go, Rust)
-- [ ] Custom rule configuration
-- [ ] Team collaboration features
-- [ ] Analytics dashboard
-- [ ] GitHub App integration
-- [ ] CI/CD integration
-- [ ] Slack/Discord notifications
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) first.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Google Gemini Team for the amazing AI API
-- FastAPI for the robust Python framework
-- Next.js team for the excellent React framework
-
-## 📧 Contact
-
-For questions or support, open an issue or contact the maintainers.
+```bash
+docker-compose up -d
+```
 
 ---
 
-**Built with ❤️ using AI-powered development**
+## 📖 Usage Guide
+
+1.  **Access Dashboard**: Open [http://localhost:3000](http://localhost:3000).
+2.  **Submit Repository**:
+    -   Enter GitHub URL (e.g., `https://github.com/owner/repo`).
+    -   (Optional) Click **Advanced Settings** to use a custom GitHub Token or Gemini Key for this specific audit.
+3.  **Monitor Progress**:
+    -   Watch "Live Logs" to see the agent cloning, analyzing, and fixing.
+    -   If the agent hits a rate limit (429), it will warn you and retry automatically.
+4.  **Review Fixes**:
+    -   Once complete, click the **Pull Request Link** to view changes on GitHub.
+
+---
+
+## 🏗️ Project Structure
+
+```
+autodev-agent/
+├── frontend/                 # Next.js 14 Application (UI)
+│   ├── src/app/             # Pages & Routes
+│   └── src/components/      # UI Components (RepoForm, AuditList)
+│
+├── backend/                  # FastAPI Application (API)
+│   ├── app/api/             # Endpoints
+│   ├── app/models/          # SQL Models
+│   └── worker/              # Celery Task Worker
+│       ├── tasks/           # Audit Logic (Cloning, Git Ops)
+│       └── agents/          # AI Logic (GeminiAgent)
+│
+├── docker-compose.yml       # Service Orchestration
+├── start.bat                # Windows Start Script
+├── start.sh                 # Mac/Linux Start Script
+└── README.md                # Documentation
+```
+
+---
+
+## 🛠️ Troubleshooting
+
+### ❌ Git Push Failed (403 Forbidden)
+- **Cause**: Your GitHub Token does not have write permissions.
+- **Fix**: Regenerate your token and ensure the **`repo`** scope box is checked. Update `.env` or use "Advanced Settings".
+
+### ⚠️ AI Agent is Busy (Rate Limit)
+- **Cause**: You exceeded the free tier quota for Gemini API.
+- **Fix**: The agent will auto-retry in ~60 seconds. Just wait. OR use a different API key in "Advanced Settings".
+
+### � Docker Issues
+- Ensure Docker Desktop is running.
+- Run `docker-compose down` followed by `docker-compose up -d --build` to reset.
+
+---
+
+## 📝 License
+MIT License.
