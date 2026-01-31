@@ -55,7 +55,7 @@ class AuditTask(Task):
 
 
 @celery_app.task(base=AuditTask, bind=True, name="worker.tasks.audit_task.process_repository_audit")
-def process_repository_audit(self, audit_id: int, db: Session):
+def process_repository_audit(self, audit_id: int, **kwargs):
     """
     Main task to process a repository audit.
     
@@ -69,8 +69,9 @@ def process_repository_audit(self, audit_id: int, db: Session):
     
     Args:
         audit_id: ID of the audit job
-        db: Database session
+        **kwargs: Contains db session injected by AuditTask
     """
+    db = kwargs.get('db')
     audit = db.query(Audit).filter(Audit.id == audit_id).first()
     
     if not audit:
