@@ -1,0 +1,145 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Bot, Github, Sparkles, RefreshCw } from 'lucide-react';
+import RepoForm from '@/components/RepoForm';
+import StatsCard from '@/components/StatsCard';
+import AuditList from '@/components/AuditList';
+import { auditAPI, Audit, Statistics } from '@/lib/api';
+
+export default function HomePage() {
+    const [audits, setAudits] = useState<Audit[]>([]);
+    const [stats, setStats] = useState<Statistics | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            const [auditsData, statsData] = await Promise.all([
+                auditAPI.getAudits(),
+                auditAPI.getStatistics(),
+            ]);
+            setAudits(auditsData);
+            setStats(statsData);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+
+        // Auto-refresh every 10 seconds
+        const interval = setInterval(fetchData, 10000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        fetchData();
+    };
+
+    return (
+        <div className="min-h-screen">
+            {/* Header */}
+            <header className="border-b border-dark-800/50 backdrop-blur-xl sticky top-0 z-50 bg-dark-950/80">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-gradient-to-br from-primary-500 to-purple-500 rounded-lg glow">
+                                <Bot className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold gradient-text">AutoDev Agent</h1>
+                                <p className="text-xs text-dark-500">AI-Powered Code Auditing</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={handleRefresh}
+                                disabled={refreshing}
+                                className="p-2 hover:bg-dark-800/50 rounded-lg transition-colors"
+                                title="Refresh"
+                            >
+                                <RefreshCw className={`w-5 h-5 text-dark-400 ${refreshing ? 'animate-spin' : ''}`} />
+                            </button>
+
+                            <a
+                                href="https://github.com/your-org/autodev-agent"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-2 bg-dark-800/50 hover:bg-dark-700/50 rounded-lg transition-colors"
+                            >
+                                <Github className="w-5 h-5 text-dark-400" />
+                                <span className="text-sm text-dark-300">GitHub</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {/* Hero Section */}
+            <section className="py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full mb-6">
+                        <Sparkles className="w-4 h-4 text-primary-400" />
+                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 1.5 Pro</span>
+                    </div>
+
+                    <h2 className="text-4xl md:text-5xl font-bold text-dark-50 mb-4 text-shadow">
+                        The Self-Healing Repository
+                    </h2>
+                    <p className="text-xl text-dark-400 max-w-2xl mx-auto">
+                        Submit a GitHub repository, and watch as AI detects bugs, generates fixes,
+                        and creates Pull Requests automatically.
+                    </p>
+                </div>
+            </section>
+
+            {/* Main Content */}
+            <main className="pb-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="spinner" />
+                            <span className="ml-3 text-dark-400">Loading...</span>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Stats */}
+                            {stats && (
+                                <div className="mb-8">
+                                    <StatsCard stats={stats} />
+                                </div>
+                            )}
+
+                            <div className="grid lg:grid-cols-3 gap-8">
+                                {/* Submission Form */}
+                                <div className="lg:col-span-1">
+                                    <RepoForm onAuditCreated={fetchData} />
+                                </div>
+
+                                {/* Audit List */}
+                                <div className="lg:col-span-2">
+                                    <AuditList audits={audits} />
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </main>
+
+            {/* Footer */}
+            <footer className="border-t border-dark-800/50 py-8 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto text-center text-dark-500 text-sm">
+                    <p>Built with ❤️ using AI-powered development</p>
+                    <p className="mt-2">Powered by Google Gemini, FastAPI, Next.js, and Docker</p>
+                </div>
+            </footer>
+        </div>
+    );
+}

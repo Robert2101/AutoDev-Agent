@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-dark-950 text-dark-50 font-sans antialiased;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-dark-900/50 backdrop-blur-xl border border-dark-700/50 shadow-2xl;
+  }
+  
+  /* Gradient Button */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-primary-500 to-purple-500 hover:from-primary-600 hover:to-purple-600
+           text-white font-semibold px-6 py-3 rounded-lg shadow-lg
+           transition-all duration-300 transform hover:scale-105 hover:shadow-xl;
+  }
+  
+  /* Input Styling */
+  .input-field {
+    @apply bg-dark-800/50 border border-dark-700 rounded-lg px-4 py-3
+           text-dark-50 placeholder-dark-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           transition-all duration-200;
+  }
+  
+  /* Status Badge */
+  .status-badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;
+  }
+  
+  /* Animated Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
+    animation: gradient 3s ease infinite;
+    background-size: 200% 200%;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .glow {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+  }
+  
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-dark-600;
+}
+
+/* Animations */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  border: 3px solid rgba(14, 165, 233, 0.1);
+  border-top-color: #0ea5e9;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 0.8s linear infinite;
+}
