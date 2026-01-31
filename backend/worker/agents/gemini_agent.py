@@ -150,8 +150,8 @@ If no issues are found, return: {{"issues": []}}
                 err_str = str(e).lower()
                 # If it's a hard quota limit (billing/tier), do NOT retry.
                 # This prevents hanging the worker for other users.
-                if "quota" in err_str or "limit" in err_str:
-                    logger.error(f"AI Quota Exceeded: {e}")
+                if ("429" in err_str and "quota" in err_str) or "quota exceeded" in err_str:
+                    logger.error(f"AI Quota Exceeded (Hard Limit): {e}")
                     raise e
 
                 if "429" in err_str:

@@ -205,9 +205,15 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
                 
                 # If we hit a quota or persistent rate limit error, stop the entire audit
                 # to prevent looping errors for every single file.
-                if "429" in err_str or "quota" in err_str or "limit" in err_str:
-                    logger.error("Quota exceeded or persistent rate limit hit. Terminating audit.")
-                    raise e
+                if ("429" in err_str and "quota" in err_str) or "quota exceeded" in err_str:
+                    logger.error("Quota exceeded. Force-terminating audit.")
+                    db.rollback() 
+                    audit.status = AuditStatus.FAILED
+                    audit.error_message = f"AI Quota Exceeded: {str(e)}"
+                    audit.completed_at = datetime.utcnow()
+                    append_log(audit, db, 'ERROR', '🛑 Audit terminated: AI Quota Exceeded. Please check your plan/billing.')
+                    db.commit()
+                    return 
                     
                 continue
         
@@ -251,6 +257,7 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
         logger.info(f"Audit completed successfully for {repository.owner}/{repository.name}")
         
     except Exception as e:
+        db.rollback()
         logger.error(f"Audit failed: {e}")
         append_log(audit, db, 'ERROR', f'❌ Audit failed: {str(e)}')
         audit.status = AuditStatus.FAILED
