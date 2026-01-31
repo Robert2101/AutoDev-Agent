@@ -8,6 +8,7 @@ from typing import List, Dict, Optional
 from app.core.config import settings
 from app.models import IssueType, IssueSeverity
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +121,6 @@ If no issues are found, return: {{"issues": []}}
                 result_text = result_text.split("```")[1].split("```")[0].strip()
             
             # Parse JSON response
-            import json
             result = json.loads(result_text)
             
             issues = result.get("issues", [])
@@ -190,7 +190,6 @@ If no secrets found, return: {{"secrets": []}}
             elif "```" in result_text:
                 result_text = result_text.split("```")[1].split("```")[0].strip()
             
-            import json
             result = json.loads(result_text)
             return result.get("secrets", [])
             
@@ -233,7 +232,6 @@ Respond with ONLY: {{"valid": true}} or {{"valid": false}}
             if "```json" in result_text:
                 result_text = result_text.split("```json")[1].split("```")[0].strip()
             
-            import json
             result = json.loads(result_text)
             return result.get("valid", False)
             
