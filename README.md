@@ -196,7 +196,15 @@ In complex scenarios, the results from the **Auditor** are fed into the **Archit
 *   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Essential)
 *   [Google Gemini API Key](https://aistudio.google.com/app/apikey)
 *   [GitHub Personal Access Token](https://github.com/settings/tokens) (Check the **`repo`** scope)
-
+*   **Environment Setup**:
+       create a file named `.env` in the root folder. Paste your keys:
+       ```env
+       GEMINI_API_KEY=your_key_here
+       GITHUB_TOKEN=your_token_here
+       DATABASE_URL=postgresql://autodev:password@db:5432/autodev_db
+       REDIS_URL=redis://redis:6379/0
+       NEXT_PUBLIC_API_URL=http://localhost:8000
+       ```
 ---
 
 ### 🪟 Windows Setup Instruction
@@ -205,23 +213,13 @@ In complex scenarios, the results from the **Auditor** are fed into the **Archit
     git clone https://github.com/Robert2101/AutoDev-Agent.git
     cd AutoDev-Agent
     ```
-2.  **Environment Setup**:
-    Open Notepad and create a file named `.env` in the root folder. Paste your keys:
-    ```env
-    GEMINI_API_KEY=your_key_here
-    GITHUB_TOKEN=your_token_here
-    DATABASE_URL=postgresql://autodev:password@db:5432/autodev_db
-    REDIS_URL=redis://redis:6379/0
-    NEXT_PUBLIC_API_URL=http://localhost:8000
-    ```
-3.  **Launch**:
-    Double-click the `start.bat` file. This will automatically:
-    *   Pull Docker images.
-    *   Build the Next.js frontend.
-    *   Start the FastAPI backend and Celery workers.
-    *   Initialize the Postgres database.
 
----
+2.  **Launch**:
+   Open **Command Prompt** or **PowerShell** in the project root directory and run:
+   ```bash
+   start.bat
+
+   ```
 
 ### 🍎 Mac / 🐧 Linux Setup Instruction
 1.  **Clone & Enter**:
