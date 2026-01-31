@@ -99,8 +99,8 @@ export default function AuditList({ audits, onRefresh }: AuditListProps) {
                                         </a>
                                     )}
 
-                                    {/* Delete Button for ANY stuck or long-running audit */}
-                                    {(audit.status === 'failed' || audit.status === 'completed' || audit.status === 'analyzing' || audit.status === 'fixing' || (audit.status === 'pending' && !audit.task_id)) && (
+                                    {/* Delete Button for ALL audits to allow manual queue management */}
+                                    {true && (
                                         <button
                                             onClick={(e) => handleDelete(e, audit.id)}
                                             disabled={deletingId === audit.id}
