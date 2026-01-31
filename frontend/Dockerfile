@@ -9,6 +9,12 @@ RUN npm install
 # Copy application code
 COPY . .
 
+# Accept API URLs as build arguments (Crucial for Next.js to bake them in during build)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ARG NEXT_PUBLIC_WS_URL
+ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+
 # Build the application (Standalone mode)
 RUN npm run build
 
