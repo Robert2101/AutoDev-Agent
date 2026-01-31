@@ -1,54 +1,17 @@
-# 🎉 AutoDev Agent Upgraded!
+# 🎉 SYSTEM UPGRADE COMPLETE (2.5 VERSION)
 
-The system is now fully patched, upgraded, and ready to go! 🚀
+## 🚀 Critical Upgrade: Gemini 2.5 Flash
+We discovered that the 2026 environment has **deprecated Gemini 1.5**.
+We have upgraded the entire AI engine to use **Gemini 2.5 Flash**.
 
-## ✅ What's Fixed & New
+### ✅ Fixed Issues
+1. **"0 Issues Found"**: Fixed by upgrading model from `gemini-1.5-pro` (404 Not Found) to `gemini-2.5-flash`.
+2. **"No Logs"**: Fixed by updating the API schema to send logs to the frontend.
+3. **Silent Failures**: Added explicit error logging so you see red ❌ errors if anything goes wrong.
 
-### 1. Smart Branch Detection 🧠
-- **Problem**: Submitting "main" for a "master" repo caused errors.
-- **Solution**: The system now **checks "main", "master", "develop", and "dev"** automatically!
-- **Action**: Just submit the URL, we figure out the branch.
+### ⚡ What to do
+1. **Delete Audit #10** (it failed silently).
+2. **Run Audit #11**.
+3. Watch the Live Logs - you will see "Analyzing..." and then real issues found!
 
-### 2. Critical Bug Fix 🐛
-- **Problem**: Audits found 0 files/issues because of a hidden Python error (`json` scope).
-- **Solution**: Fixed the import scope in the AI agent.
-- **Result**: Files are now correctly analyzed and issues are found!
-
-### 3. Live Logs Viewer 📺
-- **Problem**: You couldn't see what was happening.
-- **Solution**: Added a **Matrix-style live terminal** to the audit page.
-- **Benefit**: Watch every step: Cloning → Analyzing → Fixing → PR!
-
-### 4. Delete Button 🗑️
-- **Problem**: Failed audits cluttered the dashboard.
-- **Solution**: Added a delete button for failed/orphaned audits.
-- **Action**: Clean up your dashboard with one click.
-
-### 5. How It Works Guide 📖
-- **New**: Added a helpful guide right on the dashboard explaining the workflow.
-
----
-
-## 🎯 How to Test It Now
-
-1. **Refresh your browser** (http://localhost:3000)
-2. **Delete Audit #8** (the empty "Completed" one) using the 🗑️ button.
-3. **Submit Ecom Repo**:
-   - URL: `https://github.com/Robert2101/Ecom`
-   - Branch: `master` (or `main` - it doesn't matter now!)
-4. **Watch the Magic**:
-   - See the **Live Logs** scrolling
-   - See **Files Found** (should be > 0)
-   - See **Issues Found**
-   - See **Fixes Applied**
-   - See **PR Created** 🔗
-
----
-
-## 🔒 System Health
-- **Docker**: Rebuilt and Running ✅
-- **Database**: Connected ✅
-- **Worker**: Online & Listening ✅
-- **Frontend**: Updated & Live ✅
-
-**Enjoy your self-healing repository agent!** 🤖✨
+**Powered by Gemini 2.5 Flash** ⚡
