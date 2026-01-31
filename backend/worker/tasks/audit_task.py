@@ -134,7 +134,14 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
         audit.status = AuditStatus.CLONING
         db.commit()
         
-        clone_path = clone_repository(repository.url, repository.branch)
+        clone_path, actual_branch = clone_repository(repository.url, repository.branch)
+        
+        # Update branch if detected differently
+        if actual_branch != repository.branch:
+             logger.info(f"Updated branch from {repository.branch} to {actual_branch}")
+             append_log(audit, db, 'WARNING', f'⚠️ Branch "{repository.branch}" not found. Switched to "{actual_branch}"')
+             repository.branch = actual_branch
+             db.commit()
         append_log(audit, db, 'SUCCESS', f'✅ Repository cloned successfully')
         
         # Step 2: Analyze files
@@ -253,7 +260,7 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
                 logger.error(f"Failed to cleanup {clone_path}: {e}")
 
 
-def clone_repository(url: str, branch: str) -> str:
+def clone_repository(url: str, branch: str) -> tuple:
     """
     Clone a repository to local storage with automatic branch fallback.
     
@@ -282,7 +289,7 @@ def clone_repository(url: str, branch: str) -> str:
     try:
         git.Repo.clone_from(url, clone_path, branch=branch, depth=1)
         logger.info(f"Successfully cloned branch '{branch}'")
-        return clone_path
+        return clone_path, branch
     except git.GitCommandError as e:
         # Check if error is due to branch not found
         if "Remote branch" in str(e) and "not found" in str(e):
@@ -303,7 +310,7 @@ def clone_repository(url: str, branch: str) -> str:
                     logger.info(f"Attempting to clone with branch '{fallback}'...")
                     git.Repo.clone_from(url, clone_path, branch=fallback, depth=1)
                     logger.info(f"✅ Successfully cloned using fallback branch '{fallback}'")
-                    return clone_path
+                    return clone_path, fallback
                 except git.GitCommandError:
                     logger.warning(f"Branch '{fallback}' also not found")
                     continue
