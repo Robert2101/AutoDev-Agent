@@ -176,7 +176,7 @@ MIT License.
 
 ## 🔄 System Flow Diagram
 
-```mermaid
+
 graph TD
     A[User] -->|Submit Repo URL| B[Frontend (Next.js)]
     B -->|POST /audits| C[Backend API (FastAPI)]
@@ -192,4 +192,4 @@ graph TD
     E -->|Update Status| I[Postgres DB]
     C -->|Read Status| I
     B -->|Poll Status| C
-```
+
