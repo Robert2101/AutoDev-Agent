@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Terminal, ChevronDown, ChevronUp } from 'lucide-react';
+import { API_URL } from '@/lib/api';
 
 interface LiveLogsProps {
     auditId: number;
@@ -31,7 +32,7 @@ export default function LiveLogs({ auditId, status }: LiveLogsProps) {
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/audits/${auditId}`);
+                const response = await fetch(`${API_URL}/api/audits/${auditId}`);
                 const data = await response.json();
 
                 if (data.logs && Array.isArray(data.logs)) {
