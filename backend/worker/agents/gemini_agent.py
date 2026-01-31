@@ -148,16 +148,31 @@ If no issues are found, return: {{"issues": []}}
                 return []
             except Exception as e:
                 err_str = str(e).lower()
-                # If it's a hard quota limit (billing/tier), do NOT retry.
-                # This prevents hanging the worker for other users.
-                if ("429" in err_str and "quota" in err_str) or "quota exceeded" in err_str:
-                    logger.error(f"AI Quota Exceeded (Hard Limit): {e}")
-                    raise e
+                
+                # Fingerprint the key for debugging (first 4 and last 4)
+                current_key = "Default Key"
+                try:
+                    # Accessing private attribute to help user debug their key
+                    raw_key = genai.get_default_metadata_attributes().get('api_key', 'Unknown')
+                    if raw_key and len(raw_key) > 8:
+                        current_key = f"{raw_key[:4]}...{raw_key[-4:]}"
+                except:
+                    pass
 
+                # 429 Handling (Quota and Rate Limits)
                 if "429" in err_str:
+                    # Log which key is hitting the limit
+                    logger.warning(f"Rate Limit/Quota hit (429) using key: {current_key}")
+                    
+                    # If it's a very clear billing error, fail on the second attempt
+                    # but give it at least ONE retry just in case Google's API is glitching
+                    if ("billing" in err_str or "plan" in err_str) and attempt > 0:
+                        logger.error(f"AI Quota Exceeded (Hard Billing/Plan Limit): {e}")
+                        raise e
+
                     if attempt < max_retries - 1:
-                        wait_time = 60  # Wait for RPM reset
-                        logger.warning(f"Rate limited (429). Retrying in {wait_time}s...")
+                        wait_time = 60 if "quota" in err_str else 30
+                        logger.warning(f"Retrying in {wait_time}s (Attempt {attempt + 1}/{max_retries})...")
                         time.sleep(wait_time)
                         continue
                 
