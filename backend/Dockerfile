@@ -26,5 +26,9 @@ RUN mkdir -p /tmp/autodev-clones
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copy startup script
+COPY start_prod.sh .
+RUN chmod +x start_prod.sh
+
+# Run the application (All-in-One: API + Worker)
+CMD ["./start_prod.sh"]

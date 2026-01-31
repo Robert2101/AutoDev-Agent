@@ -30,25 +30,7 @@ services:
   # ----------------------------------------------------------------------------
   # WORKER SERVICE
   # ----------------------------------------------------------------------------
-  - type: worker
-    name: autodev-worker
-    env: docker
-    plan: free
-    region: oregon
-    dockerContext: ./backend
-    dockerfilePath: backend/Dockerfile.worker
-    numInstances: 1
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: autodev-db
-          property: connectionString
-      - key: REDIS_URL
-        sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: GITHUB_TOKEN
-        sync: false
+
 
   # ----------------------------------------------------------------------------
   # FRONTEND SERVICE
