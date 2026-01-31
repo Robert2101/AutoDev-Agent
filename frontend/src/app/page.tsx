@@ -112,60 +112,57 @@ export default function HomePage() {
                         <>
                             {/* Stats */}
                             {stats && (
-                                <div className="mb-8">
+                                <div className="mb-6">
                                     <StatsCard stats={stats} />
                                 </div>
                             )}
+
+                            {/* Related Tools - Quick Access Bar */}
+                            <div className="grid md:grid-cols-2 gap-4 mb-8">
+                                {/* VibeCraft */}
+                                <div className="glass-card rounded-2xl p-4 flex items-center gap-4 border-l-4 border-l-primary-500 hover:bg-dark-800/20 transition-all">
+                                    <div className="p-3 bg-primary-500/10 rounded-xl">
+                                        <Sparkles className="w-6 h-6 text-primary-400" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-sm font-bold text-dark-50">VibeCraft Vizualizer</h3>
+                                        <p className="text-xs text-dark-400">Interactive codebase dependency graphs.</p>
+                                    </div>
+                                    <a
+                                        href="https://repo-dig.vercel.app/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-dark-800/50 hover:bg-primary-500/20 rounded-lg text-primary-400 transition-colors"
+                                    >
+                                        <ExternalLink className="w-5 h-5" />
+                                    </a>
+                                </div>
+
+                                {/* Assignment Planner */}
+                                <div className="glass-card rounded-2xl p-4 flex items-center gap-4 border-l-4 border-l-purple-500 hover:bg-dark-800/20 transition-all">
+                                    <div className="p-3 bg-purple-500/10 rounded-xl">
+                                        <Bot className="w-6 h-6 text-purple-400" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-sm font-bold text-dark-50">Assignment Planner Pro</h3>
+                                        <p className="text-xs text-dark-400">Smart project planning & task management.</p>
+                                    </div>
+                                    <a
+                                        href="https://spectacular-gumdrop-c2c3c7.netlify.app/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 bg-dark-800/50 hover:bg-purple-500/20 rounded-lg text-purple-400 transition-colors"
+                                    >
+                                        <ExternalLink className="w-5 h-5" />
+                                    </a>
+                                </div>
+                            </div>
                             <div className="grid lg:grid-cols-3 gap-8">
                                 {/* Submission Form */}
                                 <div className="lg:col-span-1 space-y-6">
                                     <RepoForm onAuditCreated={fetchData} />
 
-                                    {/* Related Tools */}
-                                    <div className="glass-card rounded-2xl p-6 border-l-4 border-l-primary-500">
-                                        <h3 className="text-lg font-bold text-dark-50 mb-4 flex items-center gap-2">
-                                            <Sparkles className="w-5 h-5 text-primary-400" />
-                                            Related Exploration Tools
-                                        </h3>
 
-                                        <div className="space-y-6">
-                                            {/* VibeCraft */}
-                                            <div className="space-y-2">
-                                                <h4 className="text-sm font-bold text-dark-100 italic flex items-center gap-2">
-                                                    VibeCraft Vizualizer
-                                                </h4>
-                                                <p className="text-xs text-dark-400 leading-relaxed">
-                                                    Interactive, force-directed dependency graphs revealing the &quot;shape&quot; of your code architecture at a glance.
-                                                </p>
-                                                <a
-                                                    href="https://repo-dig.vercel.app/"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 text-xs font-bold rounded-lg transition-all border border-primary-500/30"
-                                                >
-                                                    Open VibeCraft <ExternalLink className="w-3 h-3" />
-                                                </a>
-                                            </div>
-
-                                            {/* Assignment Planner */}
-                                            <div className="space-y-2 pt-4 border-t border-dark-800/50">
-                                                <h4 className="text-sm font-bold text-dark-100 italic">
-                                                    Assignment Planner Pro
-                                                </h4>
-                                                <p className="text-xs text-dark-400 leading-relaxed">
-                                                    Smart project and assignment planning tool to keep your development workflow organized and on track.
-                                                </p>
-                                                <a
-                                                    href="https://spectacular-gumdrop-c2c3c7.netlify.app/"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-bold rounded-lg transition-all border border-purple-500/30"
-                                                >
-                                                    Plan Assignments <ExternalLink className="w-3 h-3" />
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     {/* How It Works Guide */}
                                     <div className="glass-card rounded-2xl p-6">
