@@ -1,15 +1,48 @@
 'use client';
 
-import { Audit } from '@/lib/api';
+import { Audit, deleteAudit } from '@/lib/api';
 import { formatRelativeTime, getStatusColor, formatStatus, calculateProgress } from '@/lib/utils';
-import { ExternalLink, GitBranch, FileCode, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ExternalLink, GitBranch, FileCode, AlertTriangle, CheckCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AuditListProps {
     audits: Audit[];
+    onRefresh?: () => void;
 }
 
-export default function AuditList({ audits }: AuditListProps) {
+export default function AuditList({ audits, onRefresh }: AuditListProps) {
+    const router = useRouter();
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+
+    const handleDelete = async (e: React.MouseEvent, auditId: number) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!confirm('Are you sure you want to delete this audit?')) {
+            return;
+        }
+
+        setDeletingId(auditId);
+
+        try {
+            await deleteAudit(auditId);
+
+            // Refresh the page or call refresh callback
+            if (onRefresh) {
+                onRefresh();
+            } else {
+                router.refresh();
+            }
+        } catch (error) {
+            console.error('Failed to delete audit:', error);
+            alert('Failed to delete audit. Please try again.');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     if (audits.length === 0) {
         return (
             <div className="glass-card rounded-2xl p-12 text-center">
@@ -52,18 +85,36 @@ export default function AuditList({ audits }: AuditListProps) {
                                     </p>
                                 </div>
 
-                                {audit.pr_url && (
-                                    <a
-                                        href={audit.pr_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-1 text-sm text-primary-400 hover:text-primary-300 transition-colors"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <span>View PR</span>
-                                        <ExternalLink className="w-4 h-4" />
-                                    </a>
-                                )}
+                                <div className="flex items-center gap-2">
+                                    {audit.pr_url && (
+                                        <a
+                                            href={audit.pr_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-1 text-sm text-primary-400 hover:text-primary-300 transition-colors"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <span>View PR</span>
+                                            <ExternalLink className="w-4 h-4" />
+                                        </a>
+                                    )}
+
+                                    {/* Delete Button for Failed or Pending Audits */}
+                                    {(audit.status === 'failed' || (audit.status === 'pending' && !audit.task_id)) && (
+                                        <button
+                                            onClick={(e) => handleDelete(e, audit.id)}
+                                            disabled={deletingId === audit.id}
+                                            className="p-2 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group/delete"
+                                            title="Delete audit"
+                                        >
+                                            {deletingId === audit.id ? (
+                                                <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <Trash2 className="w-4 h-4 text-red-400 group-hover/delete:text-red-300 transition-colors" />
+                                            )}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Progress Bar */}

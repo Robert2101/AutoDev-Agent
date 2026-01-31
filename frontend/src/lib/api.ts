@@ -99,3 +99,10 @@ export const auditAPI = {
         return response.data;
     },
 };
+
+// Standalone exports for easier imports
+export const createAudit = auditAPI.createAudit;
+export const getAudits = auditAPI.getAudits;
+export const getAudit = auditAPI.getAudit;
+export const deleteAudit = auditAPI.deleteAudit;
+export const getStatistics = auditAPI.getStatistics;
