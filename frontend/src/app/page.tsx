@@ -87,7 +87,7 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto text-center">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full mb-6">
                         <Sparkles className="w-4 h-4 text-primary-400" />
-                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 2.0 Flash</span>
+                        <span className="text-sm text-primary-400 font-medium">Powered by Google Gemini 1.5 Flash</span>
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-bold text-dark-50 mb-4 text-shadow">

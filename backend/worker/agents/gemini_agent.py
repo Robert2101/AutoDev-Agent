@@ -33,7 +33,7 @@ class GeminiAgent:
         self._api_key = api_key or settings.GEMINI_API_KEY
         genai.configure(api_key=self._api_key)
             
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
+        self.model = genai.GenerativeModel('gemini-1.5-flash')
         
         # System prompt with Chain of Thought structure
         self.system_prompt = """You are a Senior Software Engineer with expertise in:
