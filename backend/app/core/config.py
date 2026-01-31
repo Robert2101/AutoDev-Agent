@@ -56,11 +56,15 @@ class Settings(BaseSettings):
             self.CELERY_BROKER_URL = db_url.replace("postgresql://", "sqla+postgresql://", 1)
             self.CELERY_RESULT_BACKEND = "db+" + db_url
         else:
-            # Redis is explicitly set.
             # Upstash FIX: Upstash REQUIRES rediss:// (SSL) - we force it here.
             redis_url = self.REDIS_URL.strip()
             if "upstash.io" in redis_url.lower() and redis_url.startswith("redis://"):
                 redis_url = redis_url.replace("redis://", "rediss://", 1)
+                # Upstash/Render require ssl_cert_reqs to be specified for rediss://
+                if "?" not in redis_url:
+                    redis_url += "?ssl_cert_reqs=none"
+                elif "ssl_cert_reqs" not in redis_url:
+                    redis_url += "&ssl_cert_reqs=none"
             
             self.REDIS_URL = redis_url
             self.CELERY_BROKER_URL = redis_url
