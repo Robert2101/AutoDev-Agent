@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bot, Github, Sparkles, RefreshCw } from 'lucide-react';
+import { Bot, Github, Sparkles, RefreshCw, Network, ExternalLink } from 'lucide-react';
 import RepoForm from '@/components/RepoForm';
 import StatsCard from '@/components/StatsCard';
 import AuditList from '@/components/AuditList';
@@ -69,7 +69,7 @@ export default function HomePage() {
                             </button>
 
                             <a
-                                href="https://github.com/your-org/autodev-agent"
+                                href="https://github.com/Robert2101/AutoDev-Agent"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 px-4 py-2 bg-dark-800/50 hover:bg-dark-700/50 rounded-lg transition-colors"
@@ -154,6 +154,27 @@ export default function HomePage() {
                                                 • Delete bad audits easily
                                             </p>
                                         </div>
+                                    </div>
+                                    {/* VibeCraft Integration */}
+                                    <div className="glass-card rounded-2xl p-6 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="p-2 bg-indigo-500/20 rounded-lg">
+                                                <Network className="w-5 h-5 text-indigo-400" />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-dark-50">VibeCraft Visualizer</h3>
+                                        </div>
+                                        <p className="text-sm text-dark-300 mb-4 leading-relaxed">
+                                            A powerful codebase visualization tool that generates an interactive, force-directed dependency graph to reveal the &quot;shape&quot; of your code.
+                                        </p>
+                                        <a
+                                            href="https://repo-dig.vercel.app/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-indigo-500/20 group"
+                                        >
+                                            <span>Visualize Codebase</span>
+                                            <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                        </a>
                                     </div>
                                 </div>
 
