@@ -159,6 +159,14 @@ def process_repository_audit(self, audit_id: int, github_token: str = None, gemi
         
         for idx, (file_path, language) in enumerate(files_to_analyze):
             try:
+                # RE-CHECK: If the audit was deleted from the UI, STOP IMMEDIATELY
+                # This is the "proper" way to kill a zombie process on Render
+                db.expire_all() # Refresh DB state
+                check_audit = db.query(Audit).filter(Audit.id == audit_id).first()
+                if not check_audit:
+                    logger.warning(f"Audit {audit_id} was deleted. Terminating worker process.")
+                    return
+
                 # Read file content
                 with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
