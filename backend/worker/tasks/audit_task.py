@@ -187,6 +187,7 @@ def process_repository_audit(self, audit_id: int, **kwargs):
                 
             except Exception as e:
                 logger.error(f"Error analyzing {file_path}: {e}")
+                append_log(audit, db, 'ERROR', f'❌ Error analyzing {os.path.basename(file_path)}: {str(e)[:100]}...')
                 continue
         
         # Step 3: Apply fixes
