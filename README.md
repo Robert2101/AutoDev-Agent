@@ -1,195 +1,228 @@
-# AutoDev Agent - The Self-Healing Repository 🤖
+# 🤖 DevSynapse: The Autonomous Software Engineering Ecosystem
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Powered by Gemini 2.0 Flash](https://img.shields.io/badge/AI-Gemini%202.0%20Flash-purple?style=for-the-badge&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
+[![Docker Deployment](https://img.shields.io/badge/Docker-Ready-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
+[![Render Deployment](https://img.shields.io/badge/Live-Demo-green?style=for-the-badge&logo=render)](https://autodev-frontend.onrender.com/)
 
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
-[![Python](https://img.shields.io/badge/Python-3.11+-green)](https://www.python.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
-[![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-purple)](https://deepmind.google/technologies/gemini/)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
-
-> **An autonomous AI agent that audits GitHub repositories, detects bugs & security vulnerabilities using Google Gemini 2.5 Flash, and automatically opens Pull Requests with fixed code.**
+> **DevSynapse** is an industry-leading autonomous software engineering workforce. It bridges the gap between project planning, architectural understanding, and automated code maintenance using high-reasoning AI agents.
 
 ---
 
-## 🎯 What is AutoDev Agent?
-
-Imagine a world where bugs fix themselves. **AutoDev Agent** is an autonomous AI-powered system that:
-
-- 🔍 **Audits** your GitHub repositories automatically.
-- 🐛 **Detects** bugs, security vulnerabilities, and code smells.
-- 🤖 **Fixes** issues using state-of-the-art **Gemini 2.5 Flash** AI.
-- 🔄 **Opens** Pull Requests with verified fixes.
-- 🔐 **Secure** handling of credentials and API keys.
+## 🔗 Live Deployment
+**Explore the live dashboard here:** [https://autodev-frontend.onrender.com/](https://autodev-frontend.onrender.com/)
 
 ---
 
-## 🚀 Key Features
+## 🚩 Problem Statement: The Reality of Modern Dev
+**Every developer loses hours to the "Context Tax":**
 
-### 1. Multi-User & Dynamic Configuration
-- **Custom API Keys**: Users can provide their own `GitHub Token` and `Gemini API Key` for specific audits via the "Advanced Settings" UI.
-- **Privacy First**: Credentials are used only for the requested audit and not stored permanently if passed dynamicallly.
+*   **Understanding unfamiliar GitHub repositories:** Spending days deciphering file structures instead of coding.
+*   **Planning work against tight deadlines:** Losing sleep over project decomposition and resource hunting.
+*   **Fixing bugs that reappear:** Spending 60% of time on maintenance because no one fully understands dependency impacts.
 
-### 2. Intelligent Context & RAG
-- Skips irrelevant files (`node_modules`, `.git`, `dist`).
-- Prioritizes source code analysis based on language (`.py`, `.js`, `.ts`, `.go`, `.rs`, etc.).
-
-### 3. Automated PR Creation
-- **Safety Valve**: Never commits directly to `main`.
-- Creates isolated branches (e.g., `fix/ai-auto-patch-ID`).
-- Push changes and opens a PR with a detailed summary.
-
-### 4. Robust Error Handling
-- **Rate Limit Handling**: Automatically pauses and retries (Exponential Backoff) if AI quotas are exceeded.
-- **Auth Diagnostics**: Detects permission errors (e.g., missing `repo` scope) and guides users to fix them.
+**Existing tools show code — they do not show *understanding*.** DevSynapse was built to provide that missing cognitive layer.
 
 ---
 
-## 🔧 Setup & Installation
+## 🌟 The DevSynapse Ecosystem
+DevSynapse is not just a tool; it is a **triad of autonomous agents** designed to handle the entire software lifecycle:
 
-### Prerequisites
-1.  **Docker Desktop** (Running).
-2.  **Git** installed.
-3.  **Google Gemini API Key** ([Get it here](https://makersuite.google.com/app/apikey)).
-4.  **GitHub Personal Access Token** ([Get it here](https://github.com/settings/tokens)).
-    -   **Required Scope**: `repo` (Full control of private repositories).
+1.  **[Strategic Planner (AAPP)](https://spectacular-gumdrop-c2c3c7.netlify.app/)**: 
+    *   *The Project Manager:* Takes high-level assignment descriptions and decomposes them into day-by-day atomic tasks. 
+    *   *Curated Learning:* Automatically finds the best videos, docs, and repos for every step.
 
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/your-org/autodev-agent.git
-cd autodev-agent
-```
+2.  **[VibeCraft Navigator](https://repo-dig.vercel.app/)**: 
+    *   *The Architect:* Visualizes your codebase as a 3D, physics-based knowledge graph. 
+    *   *Deep Understanding:* Uses Neo4j and Tree-sitter to reveal the "shape" of your code, making complex dependencies visible at a glance.
 
-### Step 2: Configure Environment
-Create a `.env` file in the root directory:
-
-```bash
-# Copy example file (if available) or create new
-touch .env
-```
-
-**Add the following content to `.env`:**
-
-```env
-# AI Configuration
-GEMINI_API_KEY=AIzaSy...your-gemini-key
-
-# GitHub Configuration
-GITHUB_TOKEN=ghp_...your-github-token
-
-# Database & Infrastructure
-POSTGRES_USER=autodev
-POSTGRES_PASSWORD=autodev_password
-POSTGRES_DB=autodev_db
-DATABASE_URL=postgresql://autodev:autodev_password@db:5432/autodev_db
-REDIS_URL=redis://redis:6379/0
-
-# App Configuration
-SECRET_KEY=your-super-secret-key-change-this
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
+3.  **Autonomous Auditor (This Repo)**: 
+    *   *The Workhorse:* Proactively audits your repository for bugs and security flaws. 
+    *   *Self-Healing:* Don't just find bugs—it creates the fix, validates it, and opens a Pull Request autonomously.
 
 ---
 
-## ⚡ How to Run
+## 🏗️ In-Depth Architecture
 
-We provide automated scripts for a "One-Button" start experience on all platforms.
-
-### 🪟 Windows Users
-Double-click `start.bat` or run in Command Prompt:
-
-```cmd
-.\start.bat
-```
-
-### 🍎 Mac / 🐧 Linux Users
-Run the shell script:
-
-```bash
-./start.sh
-```
-
-### 🐳 Manual Method
-If you prefer running Docker Compose directly:
-
-```bash
-docker-compose up -d
-```
-
----
-
-## 📖 Usage Guide
-
-1.  **Access Dashboard**: Open [http://localhost:3000](http://localhost:3000).
-2.  **Submit Repository**:
-    -   Enter GitHub URL (e.g., `https://github.com/owner/repo`).
-    -   (Optional) Click **Advanced Settings** to use a custom GitHub Token or Gemini Key for this specific audit.
-3.  **Monitor Progress**:
-    -   Watch "Live Logs" to see the agent cloning, analyzing, and fixing.
-    -   If the agent hits a rate limit (429), it will warn you and retry automatically.
-4.  **Review Fixes**:
-    -   Once complete, click the **Pull Request Link** to view changes on GitHub.
-
----
-
-## 🏗️ Project Structure
-
-```
-autodev-agent/
-├── frontend/                 # Next.js 14 Application (UI)
-│   ├── src/app/             # Pages & Routes
-│   └── src/components/      # UI Components (RepoForm, AuditList)
-│
-├── backend/                  # FastAPI Application (API)
-│   ├── app/api/             # Endpoints
-│   ├── app/models/          # SQL Models
-│   └── worker/              # Celery Task Worker
-│       ├── tasks/           # Audit Logic (Cloning, Git Ops)
-│       └── agents/          # AI Logic (GeminiAgent)
-│
-├── docker-compose.yml       # Service Orchestration
-├── start.bat                # Windows Start Script
-├── start.sh                 # Mac/Linux Start Script
-└── README.md                # Documentation
-```
-
----
-
-## 🛠️ Troubleshooting
-
-### ❌ Git Push Failed (403 Forbidden)
-- **Cause**: Your GitHub Token does not have write permissions.
-- **Fix**: Regenerate your token and ensure the **`repo`** scope box is checked. Update `.env` or use "Advanced Settings".
-
-### ⚠️ AI Agent is Busy (Rate Limit)
-- **Cause**: You exceeded the free tier quota for Gemini API.
-- **Fix**: The agent will auto-retry in ~60 seconds. Just wait. OR use a different API key in "Advanced Settings".
-
-### � Docker Issues
-- Ensure Docker Desktop is running.
-- Run `docker-compose down` followed by `docker-compose up -d --build` to reset.
-
----
-
-## 📝 License
-MIT License.
-
-## 🔄 System Flow Diagram
+### System Workflow Diagram
+DevSynapse uses a modern, asynchronous event-driven architecture to handle high-compute AI tasks without blocking the user interface.
 
 ```mermaid
-graph TD
-    A[User] -->|Submit Repo URL| B[Frontend (Next.js)]
-    B -->|POST /audits| C[Backend API (FastAPI)]
-    C -->|Push Job| D[Redis Queue]
-    D -->|Pop Job| E[Celery Worker]
-    E -->|Git Clone| F[Temp Storage]
-    E -->|Analyze Code| G[Gemini AI (2.5 Flash)]
-    G -->|Return Issues| E
-    E -->|Generate Fixes| G
-    E -->|Apply Fixes| F
-    E -->|Git Push & PR| H[GitHub]
-    H -->|PR Created| A
-    E -->|Update Status| I[Postgres DB]
-    C -->|Read Status| I
-    B -->|Poll Status| C
+sequenceDiagram
+    participant U as Developer
+    participant FE as Next.js Frontend
+    participant BE as FastAPI Backend
+    participant RD as Redis Queue
+    participant CW as Celery Task Worker
+    participant GI as Git Engine (Cloner)
+    participant AI as Gemini 2.0 Flash
+    participant GH as GitHub API
+
+    U->>FE: Submits Repo URL
+    FE->>BE: POST /api/audits
+    BE->>RD: Enqueue Audit Task
+    RD->>CW: Trigger Background Job
+    CW->>GI: Deep Clone & Filter Files
+    GI-->>CW: Clean Source Code
+    loop For Each File
+        CW->>AI: Analyze Code (Prompt Strategy)
+        AI-->>CW: JSON Issue Report + Fixes
+    end
+    CW->>CW: Validate Fixes (Syntax Check)
+    CW->>GI: Create Fix Branch & Commit
+    CW->>GH: Push Branch & Open Pull Request
+    CW-->>BE: Update Progress (WebSocket/Polling)
+    BE-->>FE: Real-time Terminal Feedback
+    FE->>U: "Audit Complete! View your PR"
 ```
+
+### Detailed Component Roles
+*   **API Gateway (FastAPI)**: Manages authentication, audit history, and real-time log orchestration.
+*   **Task Broker (Redis)**: Ensures reliable message passing between the API and the background workers.
+*   **Execution Worker (Celery)**: The heavy-lifter. Manages local file systems, Git operations, and AI interaction.
+*   **Knowledge Base (PostgreSQL)**: Stores audit results, detected issues, and PR metadata for long-term tracking.
+
+---
+
+## 🛠️ Complete Tech Stack
+
+### 💻 Frontend (The Command Center)
+*   **Next.js 14**: Utilizing App Router for high-performance server-side rendering.
+*   **TailwindCSS**: Custom glassmorphism design system for a premium developer feel.
+*   **Lucide React**: Vector-perfect iconography for clear visual hierarchy.
+*   **Axios**: Robust API communication with interceptors for error management.
+
+### ⚙️ Backend (The Engine)
+*   **FastAPI**: High-performance Python framework with built-in Pydantic validation.
+*   **SQLAlchemy**: Advanced ORM for complex repository and issue relations.
+*   **Celery**: Distributed task queue for non-blocking analysis.
+*   **GitPython**: Low-level Git control for branch management and cloning.
+
+### 🧠 AI & Intelligence
+*   **Google Gemini 2.0 Flash**: Our primary reasoning engine. Selected for its massive context window and lightning-fast code generation.
+*   **Proprietary Prompt Templates**: Optimized for "No-Hallucination" JSON outputs.
+
+### 🗄️ Infrastructure & Storage
+*   **PostgreSQL**: Relational storage for auditing history and statistics.
+*   **Redis**: In-memory caching and task brokering.
+*   **Docker & Docker Compose**: Complete containerization for "Write Once, Run Anywhere" reliability.
+
+---
+
+## 🧠 AI Tools & Prompt Strategy
+
+DevSynapse doesn't just "talk" to AI; it orchestrates it through a multi-step **Prompt Strategy**:
+
+### 1. File Discovery & RAG-Lite
+The worker first "sees" the repo and filters out junk (node_modules, .git, .env) to sharpen the AI's focus on actual business logic.
+
+### 2. Multi-Stage Chain of Thought (CoT)
+Our system prompts enforce a 3-step reasoning process:
+1.  **Identify**: Pinpoint the line and type of bug (Security, Logic, or Performance).
+2.  **Explain**: Contextualize *why* it's a problem for the developer.
+3.  **Repair**: Generate a syntactically correct fix that maintains the original code style.
+
+### 3. Structural Output Enforcement
+We use **JSON Schema Mode** to ensure the AI never returns free-form text that would break the automated PR engine. Every response is a valid JSON object that the worker can parse and apply.
+
+---
+
+## 🏁 Setup & Installation Guide
+
+### Prerequisites
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Essential)
+*   [Google Gemini API Key](https://aistudio.google.com/app/apikey)
+*   [GitHub Personal Access Token](https://github.com/settings/tokens) (Check the **`repo`** scope)
+
+---
+
+### 🪟 Windows Setup Instruction
+1.  **Clone the Repo**:
+    ```cmd
+    git clone https://github.com/Robert2101/AutoDev-Agent.git
+    cd AutoDev-Agent
+    ```
+2.  **Environment Setup**:
+    Open Notepad and create a file named `.env` in the root folder. Paste your keys:
+    ```env
+    GEMINI_API_KEY=your_key_here
+    GITHUB_TOKEN=your_token_here
+    DATABASE_URL=postgresql://autodev:password@db:5432/autodev_db
+    REDIS_URL=redis://redis:6379/0
+    NEXT_PUBLIC_API_URL=http://localhost:8000
+    ```
+3.  **Launch**:
+    Double-click the `start.bat` file. This will automatically:
+    *   Pull Docker images.
+    *   Build the Next.js frontend.
+    *   Start the FastAPI backend and Celery workers.
+    *   Initialize the Postgres database.
+
+---
+
+### 🍎 Mac / 🐧 Linux Setup Instruction
+1.  **Clone & Enter**:
+    ```bash
+    git clone https://github.com/Robert2101/AutoDev-Agent.git
+    cd AutoDev-Agent
+    ```
+2.  **Configure Environment**:
+    ```bash
+    cp .env.example .env # Or create manually
+    nano .env
+    ```
+3.  **Permissions & Run**:
+    ```bash
+    chmod +x start.sh
+    ./start.sh
+    ```
+4.  **Verification**: 
+    Open your browser to `http://localhost:3000`. If you see the "DevSynapse" dashboard, you are live.
+
+---
+
+## ⚡ Deployment on Cloud (Render.com)
+
+DevSynapse is fully optimized for **Render's Free Tier**:
+*   **Backend**: Deploys as a Docker Web Service.
+*   **Workers**: Included in the same Docker image to save costs.
+*   **Database**: Automatic SSL configuration for Render Managed PostgreSQL.
+*   **Redis**: seamless integration with Upstash (Auto-SSL fix included).
+
+For a step-by-step guide, see our **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
+---
+
+## 🚀 Key Features in Detail
+
+### 🔍 Deep Code Auditing
+Scans your entire repository using **Gemini 2.0 Flash** to identify:
+*   **Security Vulnerabilities**: SQL injection, XSS, exposed secrets (API keys).
+*   **Logical Bugs**: Race conditions, edge-case failures, and syntax errors.
+*   **Code Smells**: Refactoring opportunities and performance bottlenecks.
+
+### 🛠️ Automated Self-Healing
+*   **PR Generation**: Automatically creates a new branch and opens a Pull Request with the fix.
+*   **Syntax Validation**: The agent validates its own fixes before submitting to ensure they are runnable.
+*   **AI Chain-of-Thought**: Uses structured prompting to "reason" through a fix before applying it.
+
+### 📊 Real-Time Developer Experience
+*   **Live Terminal Logs**: See exactly what the AI is thinking, cloning, and fixing in a real-time terminal UI.
+*   **Smart Branch Detection**: Automatically identifies your default default branch (main/master) to ensure zero-config setups.
+*   **Fast-Fail Quota Management**: Detects AI quota limits and terminates tasks gracefully to free up the execution queue.
+
+---
+
+## 🤝 Contributing & Community
+We believe in the power of open-source AI. 
+*   **Bug Reports**: Open an issue on GitHub.
+*   **Pull Requests**: We welcome UI improvements and new AI analysis protocols.
+*   **Feature Ideas**: Join our discussions to help shape the future of DevSynapse.
+
+---
+
+## 📝 License & Attribution
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+**[DevSynapse]** - Transforming the shape of software engineering. 
+*Built by the DevEdge Team for the Hackathon 2026.*
