@@ -6,6 +6,7 @@ import { ArrowLeft, GitBranch, FileCode, AlertTriangle, CheckCircle, Code2, Exte
 import Link from 'next/link';
 import { auditAPI, AuditDetail } from '@/lib/api';
 import { formatRelativeTime, getStatusColor, formatStatus, getSeverityColor } from '@/lib/utils';
+import LiveLogs from '@/components/LiveLogs';
 
 export default function AuditDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
@@ -129,6 +130,11 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Live Logs */}
+                <div className="mb-8">
+                    <LiveLogs auditId={audit.id} status={audit.status} />
                 </div>
 
                 {/* Issues List */}

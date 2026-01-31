@@ -54,6 +54,41 @@ class AuditTask(Task):
             db.close()
 
 
+def append_log(audit, db, level: str, message: str):
+    """
+    Append a log entry to the audit.
+    
+    Args:
+        audit: Audit model instance
+        db: Database session
+        level: Log level (INFO, WARNING, ERROR, SUCCESS)
+        message: Log message
+    """
+    from datetime import datetime
+    
+    if audit.logs is None:
+        audit.logs = []
+    
+    log_entry = {
+        'timestamp': datetime.utcnow().isoformat(),
+        'level': level,
+        'message': message
+    }
+    
+    # Append to logs
+    audit.logs = audit.logs + [log_entry]
+    db.commit()
+    
+    # Also log to console
+    logger.log(
+        logging.INFO if level == 'INFO' else 
+        logging.WARNING if level == 'WARNING' else 
+        logging.ERROR if level == 'ERROR' else 
+        logging.INFO,
+        message
+    )
+
+
 @celery_app.task(base=AuditTask, bind=True, name="worker.tasks.audit_task.process_repository_audit")
 def process_repository_audit(self, audit_id: int, **kwargs):
     """
@@ -85,19 +120,19 @@ def process_repository_audit(self, audit_id: int, **kwargs):
         # Update status: Starting
         audit.status = AuditStatus.PENDING
         audit.started_at = datetime.utcnow()
+        append_log(audit, db, 'INFO', f'🚀 Starting audit for {repository.owner}/{repository.name}')
         db.commit()
         
-        logger.info(f"Starting audit for {repository.owner}/{repository.name}")
-        
         # Step 1: Clone repository
-        logger.info(f"Step 1: Cloning repository {repository.url}")
+        append_log(audit, db, 'INFO', f'📥 Step 1: Cloning repository...')
         audit.status = AuditStatus.CLONING
         db.commit()
         
         clone_path = clone_repository(repository.url, repository.branch)
+        append_log(audit, db, 'SUCCESS', f'✅ Repository cloned successfully')
         
         # Step 2: Analyze files
-        logger.info("Step 2: Analyzing files")
+        append_log(audit, db, 'INFO', f'🔍 Step 2: Discovering files to analyze...')
         audit.status = AuditStatus.ANALYZING
         db.commit()
         
@@ -105,7 +140,7 @@ def process_repository_audit(self, audit_id: int, **kwargs):
         audit.total_files = len(files_to_analyze)
         db.commit()
         
-        logger.info(f"Found {len(files_to_analyze)} files to analyze")
+        append_log(audit, db, 'INFO', f'📁 Found {len(files_to_analyze)} files to analyze')
         
         all_issues = []
         
@@ -147,7 +182,8 @@ def process_repository_audit(self, audit_id: int, **kwargs):
                 audit.issues_found = len(all_issues)
                 db.commit()
                 
-                logger.info(f"Processed {idx + 1}/{len(files_to_analyze)} files")
+                if (idx + 1) % 5 == 0 or (idx + 1) == len(files_to_analyze):
+                    append_log(audit, db, 'INFO', f'⚙️  Processed {idx + 1}/{len(files_to_analyze)} files ({len(all_issues)} issues found)')
                 
             except Exception as e:
                 logger.error(f"Error analyzing {file_path}: {e}")
@@ -155,17 +191,18 @@ def process_repository_audit(self, audit_id: int, **kwargs):
         
         # Step 3: Apply fixes
         if all_issues:
-            logger.info(f"Step 3: Applying {len(all_issues)} fixes")
+            append_log(audit, db, 'INFO', f'🔧 Step 3: Applying fixes for {len(all_issues)} issues...')
             audit.status = AuditStatus.FIXING
             db.commit()
             
             fixes_applied = apply_fixes(clone_path, all_issues)
             audit.fixes_applied = fixes_applied
             db.commit()
+            append_log(audit, db, 'SUCCESS', f'✅ Applied {fixes_applied} fixes')
         
         # Step 4: Create Pull Request
         if audit.fixes_applied > 0:
-            logger.info("Step 4: Creating Pull Request")
+            append_log(audit, db, 'INFO', f'📤 Step 4: Creating Pull Request...')
             audit.status = AuditStatus.CREATING_PR
             db.commit()
             
@@ -179,17 +216,19 @@ def process_repository_audit(self, audit_id: int, **kwargs):
             if pr_url:
                 audit.pr_url = pr_url
                 audit.pr_number = pr_number
-                logger.info(f"Created PR: {pr_url}")
+                append_log(audit, db, 'SUCCESS', f'🎉 Pull Request created: #{pr_number}')
         
         # Mark as completed
         audit.status = AuditStatus.COMPLETED
         audit.completed_at = datetime.utcnow()
+        append_log(audit, db, 'SUCCESS', f'✨ Audit completed successfully! Found {audit.issues_found} issues, applied {audit.fixes_applied} fixes')
         db.commit()
         
         logger.info(f"Audit completed successfully for {repository.owner}/{repository.name}")
         
     except Exception as e:
         logger.error(f"Audit failed: {e}")
+        append_log(audit, db, 'ERROR', f'❌ Audit failed: {str(e)}')
         audit.status = AuditStatus.FAILED
         audit.error_message = str(e)
         audit.completed_at = datetime.utcnow()
