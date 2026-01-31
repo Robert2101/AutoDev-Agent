@@ -64,7 +64,7 @@ Instead of synchronous processing (user waiting on loading screen), we use a **m
 - **SQLAlchemy** - ORM
 
 ### AI & Integrations
-- **Google Gemini 1.5 Pro** - Large context window for code analysis
+- **Google Gemini 2.5 Flash** - Large context window for code analysis
 - **PyGithub** - GitHub API integration
 
 ### DevOps

@@ -117,6 +117,14 @@ When you run `docker-compose up -d`, these 5 containers start:
 
 ## ❓ FAQs
 
+### ✅ Recent Fixes
+- **Critical: 404 Model Error**: Upgraded from `gemini-1.5-pro` (deprecated) to `gemini-2.5-flash` to resolve 404 errors.
+- **Critical: Missing Logs**: Fixed API schema to return logs to the frontend.
+- **Critical: JSON Import Error**: Fixed a bug where `json` was imported inside a try block but used in an exception handler, causing all file analyses to fail.
+- **Smart Branch Detection**: Added fallback logic to try `master` if `main` fails (and vice versa).
+- **Orphaned Audits**: Added a delete button for failed/orphaned audits.
+- **Live Logs**: Added real-time logging to the UI.
+
 ### Do I need to install PostgreSQL?
 **No!** It runs in Docker. The `db` service is PostgreSQL.
 
