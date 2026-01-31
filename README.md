@@ -173,3 +173,23 @@ autodev-agent/
 
 ## 📝 License
 MIT License.
+
+## 🔄 System Flow Diagram
+
+```mermaid
+graph TD
+    A[User] -->|Submit Repo URL| B[Frontend (Next.js)]
+    B -->|POST /audits| C[Backend API (FastAPI)]
+    C -->|Push Job| D[Redis Queue]
+    D -->|Pop Job| E[Celery Worker]
+    E -->|Git Clone| F[Temp Storage]
+    E -->|Analyze Code| G[Gemini AI (2.5 Flash)]
+    G -->|Return Issues| E
+    E -->|Generate Fixes| G
+    E -->|Apply Fixes| F
+    E -->|Git Push & PR| H[GitHub]
+    H -->|PR Created| A
+    E -->|Update Status| I[Postgres DB]
+    C -->|Read Status| I
+    B -->|Poll Status| C
+```
