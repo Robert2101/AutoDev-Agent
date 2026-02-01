@@ -287,4 +287,4 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 **[DevSynapse]** - Transforming the shape of software engineering. 
-*Built by the DevEdge Team for the Hackathon 2026.*
+*Built by the Dotenv Team for the Hackathon 2026.*
